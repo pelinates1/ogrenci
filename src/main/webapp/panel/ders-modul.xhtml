@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:f="jakarta.faces.core"
+      xmlns:p="jakarta.faces.passthrough">
+<h:head>
+    <title>Ders Modülü</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"/>
+</h:head>
+<h:body class="bg-light">
+
+    <!-- Üst Menü -->
+    <nav class="navbar navbar-dark bg-warning mb-4 shadow-sm">
+        <div class="container-fluid">
+            <span class="navbar-brand text-dark mb-0 h1"><i class="bi bi-book-half"></i> Ders Yönetim Modülü</span>
+            <a href="index.xhtml" class="btn btn-outline-dark btn-sm"><i class="bi bi-arrow-left"></i> Panele Dön</a>
+        </div>
+    </nav>
+
+    <div class="container">
+
+        <h:messages globalOnly="true" infoClass="alert alert-success" errorClass="alert alert-danger" style="list-style-type:none; padding: 15px; border-radius: 5px;"/>
+
+        <div class="row">
+
+            <!-- SOL TARAF: EKLE FORMU -->
+            <div class="col-md-4">
+                <div class="card shadow-sm mb-4 border-0">
+                    <div class="card-header bg-warning text-dark">
+                        <h5 class="card-title mb-0"><i class="bi bi-plus-square-fill"></i> Yeni Ders Ekle</h5>
+                    </div>
+                    <div class="card-body bg-white">
+                        <h:form id="dersForm">
+
+                            <div class="mb-3">
+                                <label class="form-label fw-bold text-dark">Ders Kodu</label>
+                                <h:inputText value="#{courseBean.seciliDers.dersKodu}" required="true" requiredMessage="Ders Kodu zorunlu!" styleClass="form-control border-warning" p:placeholder="Örn: MAT101" />
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-bold text-dark">Ders Adı</label>
+                                <h:inputText value="#{courseBean.seciliDers.dersAdi}" required="true" requiredMessage="Ders Adı zorunlu!" styleClass="form-control border-warning" p:placeholder="Örn: Matematik I" />
+                            </div>
+
+                            <!-- Öğretmen Seçimi (Açılır Menü) -->
+                            <div class="mb-3">
+                                <label class="form-label fw-bold text-dark">Dersi Veren Öğretmen</label>
+                                <h:selectOneMenu value="#{courseBean.seciliOgretmenId}" required="true" requiredMessage="Lütfen bir öğretmen seçin!" styleClass="form-select border-warning">
+                                    <f:selectItem itemLabel="--- Öğretmen Seçiniz ---" itemValue="#{null}" noSelectionOption="true" />
+                                    <!-- Veritabanından gelen öğretmenleri listeliyoruz -->
+                                    <f:selectItems value="#{courseBean.ogretmenListesi}" var="hoca" itemValue="#{hoca.id}" itemLabel="#{hoca.ad} #{hoca.soyad} (#{hoca.okulNo})" />
+                                </h:selectOneMenu>
+                            </div>
+
+                            <div class="d-grid gap-2 mt-4">
+                                <h:commandButton value="Dersi Sisteme Kaydet" action="#{courseBean.kaydet}" styleClass="btn btn-warning fw-bold text-dark" />
+
+                                <h:commandButton value="Formu Temizle" action="#{courseBean.temizle}" styleClass="btn btn-outline-secondary" immediate="true">
+                                    <f:ajax render="@form" />
+                                </h:commandButton>
+                            </div>
+                        </h:form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SAĞ TARAF: DERS LİSTESİ (TABLO) -->
+            <div class="col-md-8">
+                <div class="card shadow-sm border-warning">
+                    <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0"><i class="bi bi-journals"></i> Sistemdeki Dersler</h5>
+                        <span class="badge bg-warning text-dark rounded-pill">#{courseBean.dersListesi.size()} Kayıtlı</span>
+                    </div>
+                    <div class="card-body bg-white p-0">
+                        <h:form id="listeForm">
+                            <h:dataTable value="#{courseBean.dersListesi}" var="ders" styleClass="table table-striped table-hover align-middle mb-0">
+
+                                <h:column>
+                                    <f:facet name="header">Ders Kodu</f:facet>
+                                    <span class="badge bg-dark">#{ders.dersKodu}</span>
+                                </h:column>
+
+                                <h:column>
+                                    <f:facet name="header">Ders Adı</f:facet>
+                                    <span class="fw-bold">#{ders.dersAdi}</span>
+                                </h:column>
+
+                                <h:column>
+                                    <f:facet name="header">Öğretmeni</f:facet>
+                                    <i class="bi bi-person-fill text-muted"></i> #{ders.ogretmen.ad} #{ders.ogretmen.soyad}
+                                </h:column>
+
+                                <h:column>
+                                    <f:facet name="header"><div class="text-center">İşlemler</div></f:facet>
+                                    <div class="text-center">
+                                        <!-- Ders Silme Butonu -->
+                                        <h:commandLink action="#{courseBean.sil(ders)}" styleClass="btn btn-danger btn-sm" onclick="return confirm('Bu dersi silmek istediğinize emin misiniz?');" title="Dersi Sil">
+                                            <i class="bi bi-trash-fill"></i> Sil
+                                        </h:commandLink>
+                                    </div>
+                                </h:column>
+                            </h:dataTable>
+
+                            <h:panelGroup rendered="#{empty courseBean.dersListesi}">
+                                <div class="text-center text-muted p-4">
+                                    <i class="bi bi-info-circle fs-4 d-block mb-2 text-warning"></i>
+                                    Sistemde kayıtlı hiçbir ders bulunmamaktadır.
+                                </div>
+                            </h:panelGroup>
+
+                        </h:form>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</h:body>
+</html>

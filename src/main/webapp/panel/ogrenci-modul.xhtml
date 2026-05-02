@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:f="jakarta.faces.core"
+      xmlns:p="jakarta.faces.passthrough">
+<h:head>
+    <title>Öğrenci Modülü</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"/>
+</h:head>
+<h:body class="bg-light">
+
+    <!-- Üst Menü -->
+    <nav class="navbar navbar-dark bg-success mb-4 shadow-sm">
+        <div class="container-fluid">
+            <span class="navbar-brand mb-0 h1"><i class="bi bi-mortarboard-fill text-light"></i> Öğrenci Yönetim Modülü</span>
+            <a href="index.xhtml" class="btn btn-outline-light btn-sm"><i class="bi bi-arrow-left"></i> Panele Dön</a>
+        </div>
+    </nav>
+
+    <div class="container">
+
+        <h:messages globalOnly="true" infoClass="alert alert-success" errorClass="alert alert-danger" style="list-style-type:none; padding: 15px; border-radius: 5px;"/>
+
+        <div class="row">
+
+            <!-- SOL TARAF: EKLE/GÜNCELLE FORMU -->
+            <div class="col-md-4">
+                <div class="card shadow-sm mb-4 border-0">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="card-title mb-0"><i class="bi bi-person-plus-fill"></i> Öğrenci Bilgileri</h5>
+                    </div>
+                    <div class="card-body bg-white">
+                        <h:form id="ogrenciForm">
+                            <h:inputHidden value="#{studentBean.seciliOgrenci.id}" />
+
+                            <div class="mb-3">
+                                <label class="form-label fw-bold text-success">Okul No (Öğrenci Numarası)</label>
+                                <h:inputText value="#{studentBean.seciliOgrenci.okulNo}" required="true" requiredMessage="Okul no zorunlu!" styleClass="form-control border-success-subtle" p:placeholder="Örn: 202401" />
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-bold text-success">Adı</label>
+                                <h:inputText value="#{studentBean.seciliOgrenci.ad}" required="true" requiredMessage="Ad zorunlu!" styleClass="form-control border-success-subtle" p:placeholder="Öğrenci Adı" />
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-bold text-success">Soyadı</label>
+                                <h:inputText value="#{studentBean.seciliOgrenci.soyad}" required="true" requiredMessage="Soyad zorunlu!" styleClass="form-control border-success-subtle" p:placeholder="Öğrenci Soyadı" />
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-bold text-success">Şifre</label>
+                                <h:inputSecret value="#{studentBean.seciliOgrenci.sifre}" required="true" requiredMessage="Şifre zorunlu!" styleClass="form-control border-success-subtle" p:placeholder="******" />
+                            </div>
+
+                            <div class="d-grid gap-2 mt-4">
+                                <h:commandButton value="Kaydet / Güncelle" action="#{studentBean.kaydet}" styleClass="btn btn-success fw-bold" />
+
+                                <h:commandButton value="Formu Temizle" action="#{studentBean.temizle}" styleClass="btn btn-outline-secondary" immediate="true">
+                                    <f:ajax render="@form" />
+                                </h:commandButton>
+                            </div>
+                        </h:form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SAĞ TARAF: ÖĞRENCİ LİSTESİ (TABLO) -->
+            <div class="col-md-8">
+                <div class="card shadow-sm border-0">
+                    <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0"><i class="bi bi-list-columns-reverse"></i> Sistemdeki Öğrenciler</h5>
+                        <span class="badge bg-success rounded-pill">#{studentBean.ogrenciListesi.size()} Kayıtlı</span>
+                    </div>
+                    <div class="card-body bg-white p-0">
+                        <h:form id="listeForm">
+                            <h:dataTable value="#{studentBean.ogrenciListesi}" var="ogr" styleClass="table table-striped table-hover align-middle mb-0">
+
+                                <h:column>
+                                    <f:facet name="header">Okul No</f:facet>
+                                    <span class="badge bg-success bg-opacity-75">#{ogr.okulNo}</span>
+                                </h:column>
+
+                                <h:column>
+                                    <f:facet name="header">Adı</f:facet>
+                                    #{ogr.ad}
+                                </h:column>
+
+                                <h:column>
+                                    <f:facet name="header">Soyadı</f:facet>
+                                    #{ogr.soyad}
+                                </h:column>
+
+                                <h:column>
+                                    <f:facet name="header"><div class="text-center">İşlemler</div></f:facet>
+                                    <div class="text-center">
+
+                                        <h:commandLink action="#{studentBean.formaGetir(ogr)}" styleClass="btn btn-warning btn-sm me-2" title="Bilgileri Düzenle">
+                                            <i class="bi bi-pencil-square"></i> Seç
+                                        </h:commandLink>
+
+                                        <h:commandLink action="#{studentBean.sil(ogr)}" styleClass="btn btn-danger btn-sm" onclick="return confirm('Dikkat: Bu öğrenciyi sistemden kalıcı olarak silmek istediğinize emin misiniz?');" title="Sistemden Sil">
+                                            <i class="bi bi-trash-fill"></i
