@@ -1,64 +1,119 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:h="jakarta.faces.html"
-      xmlns:f="jakarta.faces.core">
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
 <h:head>
-    <title>Ders Kayıt İşlemleri</title>
+    <title>Ders Kayıt İşlemleri - OBS</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"/>
+    <style>
+        :root { --admin-red: #ff0000; --sidebar-dark: #1a1a1a; }
+        body { background-color: #f8f9fa; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; }
+        
+        .sidebar {
+            width: 260px; height: 100vh; background-color: var(--sidebar-dark);
+            position: fixed; top: 0; left: 0; color: white; padding: 20px 0;
+            box-shadow: 4px 0 10px rgba(0,0,0,0.1); z-index: 1000;
+        }
+        .sidebar-brand { padding: 0 25px 30px; border-bottom: 1px solid #333; margin-bottom: 20px; }
+        .sidebar-brand h4 { color: var(--admin-red); font-weight: bold; margin: 0; letter-spacing: 1px; }
+        
+        .nav-link {
+            color: #adb5bd; padding: 14px 25px; transition: all 0.3s;
+            display: flex; align-items: center; text-decoration: none;
+            border-left: 4px solid transparent;
+        }
+        .nav-link i { margin-right: 12px; font-size: 1.2rem; }
+        .nav-link:hover, .nav-link.active { 
+            background-color: rgba(255, 0, 0, 0.1); 
+            color: white; 
+            border-left: 4px solid var(--admin-red); 
+        }
+
+        .main-content { margin-left: 260px; padding: 30px; min-height: 100vh; }
+        
+        .header {
+            display: flex; align-items: center; gap: 20px;
+            background: white; padding: 15px 30px; border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.05); margin-bottom: 30px;
+        }
+
+        .back-btn {
+            color: var(--sidebar-dark); font-size: 1.5rem; transition: 0.3s;
+            text-decoration: none; display: flex; align-items: center;
+        }
+        .back-btn:hover { color: var(--admin-red); transform: translateX(-5px); }
+
+        .card { border-radius: 15px; border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .border-red { border-top: 5px solid var(--admin-red) !important; }
+        .text-red { color: var(--admin-red) !important; }
+        .btn-red { background-color: var(--admin-red); color: white; font-weight: bold; border-radius: 10px; }
+        .btn-red:hover { background-color: #cc0000; color: white; }
+    </style>
 </h:head>
-<h:body class="bg-light">
+<h:body>
+    <f:metadata>
+        <f:event type="preRenderView" listener="#{loginBean.checkLogin}"/>
+    </f:metadata>
 
-    <!-- Üst Menü -->
-    <nav class="navbar navbar-dark bg-info mb-4 shadow-sm">
-        <div class="container-fluid">
-            <span class="navbar-brand text-dark mb-0 h1"><i class="bi bi-link-45deg"></i> Ders Kayıt (Atama) Modülü</span>
-            <a href="index.xhtml" class="btn btn-outline-dark btn-sm"><i class="bi bi-arrow-left"></i> Panele Dön</a>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-brand"><h4>OBS PANEL</h4></div>
+        <nav class="mt-2">
+            <a href="index.xhtml" class="nav-link"><i class="bi bi-grid-1x2-fill"></i> Ana Sayfa</a>
+            <a href="ogrenci-modul.xhtml" class="nav-link"><i class="bi bi-mortarboard-fill"></i> Öğrenci İşlemleri</a>
+            <a href="ogretmen-modul.xhtml" class="nav-link"><i class="bi bi-person-badge-fill"></i> Öğretmen İşlemleri</a>
+            <a href="ders-modul.xhtml" class="nav-link"><i class="bi bi-journal-text"></i> Ders Yönetimi</a>
+            <a href="takvim-modul.xhtml" class="nav-link"><i class="bi bi-calendar-check-fill"></i> Akademik Takvim</a>
+            <a href="sinav-modul.xhtml" class="nav-link"><i class="bi bi-file-earmark-spreadsheet-fill"></i> Sınav Planlama</a>
+        </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="header">
+            <a href="index.xhtml" class="back-btn" title="Geri Dön">
+                <i class="bi bi-arrow-left-circle-fill"></i>
+            </a>
+            <h4 class="mb-0 fw-bold">Ders Kayıt (Atama)</h4>
         </div>
-    </nav>
 
-    <div class="container mt-5">
-        <div class="row justify-content-center">
-            <div class="col-md-6">
+        <div class="row justify-content-center mt-4">
+            <div class="col-md-7">
+                <h:messages globalOnly="true" infoClass="alert alert-success" errorClass="alert alert-danger" id="mesajlar" style="list-style:none; padding:15px; border-radius:12px;"/>
 
-                <h:messages globalOnly="true" infoClass="alert alert-success" errorClass="alert alert-danger" style="list-style-type:none; padding: 15px; border-radius: 5px;"/>
-
-                <div class="card shadow-lg border-0 border-top border-info border-5">
-                    <div class="card-body p-5">
-                        <h4 class="card-title text-center mb-4"><i class="bi bi-person-lines-fill"></i> Öğrenciyi Derse Kaydet</h4>
-
+                <div class="card border-red">
+                    <div class="card-body p-5 text-center">
+                        <h3 class="fw-bold text-red mb-4"><i class="bi bi-person-lines-fill"></i> Öğrenci-Ders Eşleştirme</h3>
                         <h:form id="kayitForm">
-
-                            <!-- 1. Ders Seçimi -->
-                            <div class="mb-4">
-                                <label class="form-label fw-bold">1. Dersi Seçin</label>
+                            <div class="mb-4 text-start">
+                                <label class="form-label fw-bold small text-muted">1. Dersi Seçin</label>
                                 <h:selectOneMenu value="#{enrollmentBean.seciliDersId}" styleClass="form-select form-select-lg">
-                                    <f:selectItem itemLabel="-- Lütfen Bir Ders Seçin --" itemValue="#{null}" noSelectionOption="true" />
-                                    <f:selectItems value="#{enrollmentBean.tumDersler}" var="ders" itemValue="#{ders.id}" itemLabel="#{ders.dersKodu} - #{ders.dersAdi} (#{ders.ogretmen.ad})" />
+                                    <f:selectItem itemLabel="-- Seçiniz --" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItems value="#{enrollmentBean.tumDersler}" var="ders" itemValue="#{ders.id}" itemLabel="#{ders.dersKodu} - #{ders.dersAdi}" />
                                 </h:selectOneMenu>
                             </div>
 
-                            <!-- 2. Öğrenci Seçimi -->
-                            <div class="mb-4">
-                                <label class="form-label fw-bold">2. Öğrenciyi Seçin</label>
+                            <div class="mb-4 text-start">
+                                <label class="form-label fw-bold small text-muted">2. Öğrenciyi Seçin</label>
                                 <h:selectOneMenu value="#{enrollmentBean.seciliOgrenciId}" styleClass="form-select form-select-lg">
-                                    <f:selectItem itemLabel="-- Lütfen Bir Öğrenci Seçin --" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItem itemLabel="-- Seçiniz --" itemValue="#{null}" noSelectionOption="true" />
                                     <f:selectItems value="#{enrollmentBean.tumOgrenciler}" var="ogr" itemValue="#{ogr.id}" itemLabel="#{ogr.okulNo} | #{ogr.ad} #{ogr.soyad}" />
                                 </h:selectOneMenu>
                             </div>
 
                             <div class="d-grid mt-5">
-                                <h:commandButton value="Öğrenciyi Derse Kaydet" action="#{enrollmentBean.kayitYap}" styleClass="btn btn-info btn-lg text-dark fw-bold shadow-sm" />
+                                <h:commandButton value="Kaydı Tamamla" action="#{enrollmentBean.kayitYap}" styleClass="btn btn-red btn-lg shadow-sm">
+                                    <f:ajax execute="@form" render="@form mesajlar" />
+                                </h:commandButton>
                             </div>
                         </h:form>
-
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </h:body>
 </html>

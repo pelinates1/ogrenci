@@ -2,100 +2,85 @@ package bean;
 
 import com.example.entity.Course;
 import com.example.entity.Users;
-import com.example.enums.RoleEnum;
 import facadeLocal.CourseFacadeLocal;
-import facadeLocal.UserFacadeLocal;
 import jakarta.annotation.PostConstruct;
 import jakarta.ejb.EJB;
-import jakarta.faces.application.FacesMessage;
-import jakarta.faces.context.FacesContext;
 import jakarta.faces.view.ViewScoped;
 import jakarta.inject.Named;
-
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
-@Named("courseBean")
+@Named
 @ViewScoped
 public class CourseBean implements Serializable {
 
-    private Course seciliDers;
+    private Course seciliDers = new Course();
     private List<Course> dersListesi;
-    private List<Users> ogretmenListesi; // Formdaki açılır menü (SelectBox) için lazım
-
-    // Hangi öğretmenin seçildiğini tutacak (ID olarak)
+    private List<Users> ogretmenListesi;
     private Long seciliOgretmenId;
+    private String aramaMetni;
 
     @EJB
     private CourseFacadeLocal courseFacade;
 
-    @EJB
-    private UserFacadeLocal userFacade;
-
     @PostConstruct
     public void init() {
-        seciliDers = new Course();
         dersleriGetir();
-        ogretmenleriGetir();
+        ogretmenListesi = courseFacade.teacherList();
     }
 
     public void dersleriGetir() {
-        dersListesi = courseFacade.courseList();
-    }
-
-    public void ogretmenleriGetir() {
-        ogretmenListesi = new ArrayList<>();
-        List<Users> tumKullanicilar = userFacade.usersList();
-        if (tumKullanicilar != null) {
-            for (Users u : tumKullanicilar) {
-                if (u.getRol() == RoleEnum.TEACHER) {
-                    ogretmenListesi.add(u);
-                }
-            }
+        List<Course> allCourses = courseFacade.courseList();
+        if (aramaMetni != null && !aramaMetni.isEmpty()) {
+            dersListesi = allCourses.stream()
+                    .filter(c -> (c.getDersAdi() != null && c.getDersAdi().toLowerCase().contains(aramaMetni.toLowerCase())) || 
+                                 (c.getDersKodu() != null && c.getDersKodu().toLowerCase().contains(aramaMetni.toLowerCase())))
+                    .collect(Collectors.toList());
+        } else {
+            dersListesi = allCourses;
         }
     }
 
     public void kaydet() {
         try {
-            // Açılır menüden seçilen ID'ye göre öğretmeni bul ve derse ekle
             if (seciliOgretmenId != null) {
                 Users ogretmen = new Users();
                 ogretmen.setId(seciliOgretmenId);
                 seciliDers.setOgretmen(ogretmen);
             }
 
-            courseFacade.createCourse(seciliDers);
-            mesajGoster("Başarılı", "Ders sisteme başarıyla eklendi.");
-            temizle();
+            if (seciliDers.getId() == null) {
+                courseFacade.create(seciliDers);
+            } else {
+                courseFacade.edit(seciliDers);
+            }
+            seciliDers = new Course();
+            seciliOgretmenId = null;
             dersleriGetir();
-
         } catch (Exception e) {
-            mesajGoster("Hata", "Ders eklenirken bir hata oluştu!");
+            e.printStackTrace();
         }
     }
 
     public void sil(Course c) {
-        try {
-            courseFacade.removeCourse(c);
-            mesajGoster("Başarılı", "Ders silindi.");
-            dersleriGetir();
-        } catch (Exception e) {
-            mesajGoster("Hata", "Silme işlemi başarısız!");
+        courseFacade.remove(c);
+        dersleriGetir();
+    }
+
+    public void formaGetir(Course c) {
+        this.seciliDers = c;
+        if (c.getOgretmen() != null) {
+            this.seciliOgretmenId = c.getOgretmen().getId();
         }
     }
 
     public void temizle() {
-        this.seciliDers = new Course();
-        this.seciliOgretmenId = null;
+        seciliDers = new Course();
+        seciliOgretmenId = null;
     }
 
-    private void mesajGoster(String baslik, String icerik) {
-        FacesContext.getCurrentInstance().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_INFO, baslik, icerik));
-    }
-
-    // --- GETTER & SETTER ---
+    // --- Getter & Setter ---
     public Course getSeciliDers() { return seciliDers; }
     public void setSeciliDers(Course seciliDers) { this.seciliDers = seciliDers; }
     public List<Course> getDersListesi() { return dersListesi; }
@@ -104,4 +89,6 @@ public class CourseBean implements Serializable {
     public void setOgretmenListesi(List<Users> ogretmenListesi) { this.ogretmenListesi = ogretmenListesi; }
     public Long getSeciliOgretmenId() { return seciliOgretmenId; }
     public void setSeciliOgretmenId(Long seciliOgretmenId) { this.seciliOgretmenId = seciliOgretmenId; }
+    public String getAramaMetni() { return aramaMetni; }
+    public void setAramaMetni(String aramaMetni) { this.aramaMetni = aramaMetni; }
 }

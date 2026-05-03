@@ -1,175 +1,149 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:h="jakarta.faces.html"
-      xmlns:f="jakarta.faces.core">
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://xmlns.jcp.org/jsf/passthrough">
 <h:head>
     <title>Yönetici Paneli - OBS</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"/>
     <style>
         :root { --admin-red: #ff0000; --sidebar-dark: #1a1a1a; }
-        body { background-color: #f8f9fa; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; }
-        
-        /* Sidebar Tasarımı */
-        .sidebar {
-            width: 260px; height: 100vh; background-color: var(--sidebar-dark);
-            position: fixed; top: 0; left: 0; color: white; padding: 20px 0;
-            box-shadow: 4px 0 10px rgba(0,0,0,0.1); z-index: 1000;
-        }
-        .sidebar-brand { padding: 0 25px 30px; border-bottom: 1px solid #333; margin-bottom: 20px; }
-        .sidebar-brand h4 { color: var(--admin-red); font-weight: bold; margin: 0; letter-spacing: 1px; }
-        
-        .nav-link {
-            color: #adb5bd; padding: 14px 25px; transition: all 0.3s;
-            display: flex; align-items: center; text-decoration: none;
-            border-left: 4px solid transparent;
-        }
-        .nav-link i { margin-right: 12px; font-size: 1.2rem; }
-        .nav-link:hover, .nav-link.active { 
-            background-color: rgba(255, 0, 0, 0.1); 
-            color: white; 
-            border-left: 4px solid var(--admin-red); 
-        }
-
-        /* Main Content Area */
-        .main-content { margin-left: 260px; padding: 30px; min-height: 100vh; }
-        
-        /* Top Header */
-        .header {
-            display: flex; justify-content: space-between; align-items: center;
-            background: white; padding: 15px 30px; border-radius: 12px;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.05); margin-bottom: 30px;
-        }
-        .user-info { display: flex; align-items: center; gap: 15px; }
-        .user-avatar { 
-            width: 40px; height: 40px; background: var(--admin-red); 
-            color: white; border-radius: 50%; display: flex; 
-            align-items: center; justify-content: center; font-weight: bold;
-        }
-
-        /* Stat Cards */
-        .stat-card {
-            background: white; border-radius: 15px; padding: 25px;
-            border-left: 5px solid var(--admin-red);
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-            height: 100%;
-        }
-        .stat-card:hover { transform: translateY(-5px); box-shadow: 0 8px 25px rgba(0,0,0,0.1); }
-        .stat-icon-wrapper {
-            width: 60px; height: 60px; background: rgba(255, 0, 0, 0.05);
-            border-radius: 12px; display: flex; align-items: center; 
-            justify-content: center; color: var(--admin-red); font-size: 1.8rem;
-        }
-        .stat-title { color: #888; font-size: 0.85rem; font-weight: 700; text-transform: uppercase; margin-bottom: 5px; }
-        .stat-value { font-size: 2rem; font-weight: 800; color: #2d3436; }
-
-        /* Welcome Section */
-        .welcome-box {
-            background: white; border-radius: 20px; padding: 50px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-            text-align: center; border: 1px solid rgba(0,0,0,0.03);
-        }
+        body { background-color: #f8f9fa; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 0; }
+        .sidebar { width: 260px; height: 100vh; background: var(--sidebar-dark); position: fixed; top: 0; left: 0; color: white; padding: 20px 0; z-index: 1000; }
+        .nav-link { color: #adb5bd; padding: 12px 25px; display: flex; align-items: center; text-decoration: none; transition: 0.3s; }
+        .nav-link:hover, .nav-link.active { background: rgba(255, 0, 0, 0.1); color: white; border-left: 4px solid var(--admin-red); }
+        .nav-link i { margin-right: 10px; }
+        .main-content { margin-left: 260px; padding: 30px; }
+        .header { display: flex; justify-content: space-between; align-items: center; background: white; padding: 15px 30px; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.05); margin-bottom: 30px; }
+        .user-avatar { width: 40px; height: 40px; background: var(--admin-red); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; }
+        .card { border-radius: 15px; border: none; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        .stat-card { background: white; border-radius: 15px; padding: 25px; border-left: 5px solid var(--admin-red); box-shadow: 0 4px 15px rgba(0,0,0,0.05); height: 100%; }
+        .stat-icon-wrapper { width: 60px; height: 60px; background: rgba(255, 0, 0, 0.05); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: var(--admin-red); font-size: 1.8rem; }
     </style>
 </h:head>
 <h:body>
-    <!-- Güvenlik Kontrolü -->
     <f:metadata>
         <f:event type="preRenderView" listener="#{loginBean.checkLogin}"/>
     </f:metadata>
 
-    <!-- Sidebar -->
     <div class="sidebar">
-        <div class="sidebar-brand">
-            <h4>OBS PANEL</h4>
-        </div>
-        <nav class="mt-2">
-            <a href="#" class="nav-link active"><i class="bi bi-grid-1x2-fill"></i> Ana Sayfa</a>
-            <a href="#" class="nav-link"><i class="bi bi-mortarboard-fill"></i> Öğrenci İşlemleri</a>
-            <a href="#" class="nav-link"><i class="bi bi-person-badge-fill"></i> Öğretmen İşlemleri</a>
-            <a href="#" class="nav-link"><i class="bi bi-journal-text"></i> Ders Yönetimi</a>
-            <a href="#" class="nav-link"><i class="bi bi-calendar3"></i> Akademik Takvim</a>
-            <div class="mt-4 pt-4 border-top border-secondary">
-                <a href="#" class="nav-link"><i class="bi bi-sliders"></i> Sistem Ayarları</a>
-            </div>
+        <div class="px-4 mb-4"><h4>OBS PANEL</h4></div>
+        <nav>
+            <a href="index.xhtml" class="nav-link active"><i class="bi bi-grid-1x2-fill"></i> Ana Sayfa</a>
+            <a href="ogrenci-modul.xhtml" class="nav-link"><i class="bi bi-mortarboard-fill"></i> Öğrenci İşlemleri</a>
+            <a href="ogretmen-modul.xhtml" class="nav-link"><i class="bi bi-person-badge-fill"></i> Öğretmen İşlemleri</a>
+            <a href="ders-modul.xhtml" class="nav-link"><i class="bi bi-journal-text"></i> Ders Yönetimi</a>
+            <a href="takvim-modul.xhtml" class="nav-link"><i class="bi bi-calendar-check-fill"></i> Akademik Takvim</a>
+            <a href="sinav-modul.xhtml" class="nav-link"><i class="bi bi-file-earmark-spreadsheet-fill"></i> Sınav Planlama</a>
+            <a href="duyuru-modul.xhtml" class="nav-link"><i class="bi bi-megaphone-fill"></i> Duyuru Yönetimi</a>
         </nav>
     </div>
 
-    <!-- Main Content Area -->
     <div class="main-content">
-        <!-- Top Header -->
+        <!-- Header -->
         <div class="header">
             <div>
                 <h4 class="mb-0 fw-bold">Yönetim Paneli</h4>
-                <small class="text-muted">Öğrenci Otomasyon Sistemi Genel Bakış</small>
+                <small class="text-muted">Genel Bakış</small>
             </div>
-            <div class="user-info">
-                <div class="text-end">
+            <div class="d-flex align-items-center">
+                <div class="text-end me-3">
                     <div class="fw-bold text-dark">#{sessionScope.user.ad} #{sessionScope.user.soyad}</div>
-                    <small class="text-danger fw-semibold">Sistem Yöneticisi</small>
+                    <div class="d-flex flex-column">
+                        <small class="fw-bold text-danger" style="font-size: 0.85rem;">#{sessionScope.user.okulNo}</small>
+                    </div>
                 </div>
-                <div class="user-avatar">
-                    #{sessionScope.user.ad.substring(0,1)}
-                </div>
-                <h:form style="margin-left: 15px;">
+                <div class="user-avatar me-3">#{sessionScope.user.ad.substring(0,1)}</div>
+                <h:form>
                     <h:commandLink action="#{loginBean.logout}" styleClass="btn btn-outline-danger btn-sm rounded-pill px-3">
-                        <i class="bi bi-power"></i> Çıkış
+                        <i class="bi bi-power me-1"></i> Çıkış Yap
                     </h:commandLink>
                 </h:form>
             </div>
         </div>
 
-        <!-- Dashboard İstatistikleri -->
+        <!-- İstatistikler -->
         <div class="row g-4 mb-5">
             <div class="col-md-4">
-                <div class="stat-card d-flex align-items-center justify-content-between">
-                    <div>
-                        <div class="stat-title">Kayıtlı Öğrenciler</div>
-                        <div class="stat-value">124</div>
-                    </div>
-                    <div class="stat-icon-wrapper">
-                        <i class="bi bi-people"></i>
+                <div class="stat-card">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div><p class="text-muted fw-bold small mb-1">ÖĞRENCİ</p><h2 class="mb-0 fw-bold">#{dashboardBean.ogrenciSayisi}</h2></div>
+                        <div class="stat-icon-wrapper"><i class="bi bi-people-fill"></i></div>
                     </div>
                 </div>
             </div>
             <div class="col-md-4">
-                <div class="stat-card d-flex align-items-center justify-content-between">
-                    <div>
-                        <div class="stat-title">Aktif Öğretmenler</div>
-                        <div class="stat-value">18</div>
-                    </div>
-                    <div class="stat-icon-wrapper">
-                        <i class="bi bi-person-check"></i>
+                <div class="stat-card">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div><p class="text-muted fw-bold small mb-1">ÖĞRETMEN</p><h2 class="mb-0 fw-bold">#{dashboardBean.ogretmenSayisi}</h2></div>
+                        <div class="stat-icon-wrapper"><i class="bi bi-person-check-fill"></i></div>
                     </div>
                 </div>
             </div>
             <div class="col-md-4">
-                <div class="stat-card d-flex align-items-center justify-content-between">
-                    <div>
-                        <div class="stat-title">Açılan Dersler</div>
-                        <div class="stat-value">9</div>
-                    </div>
-                    <div class="stat-icon-wrapper">
-                        <i class="bi bi-journal-bookmark"></i>
+                <div class="stat-card">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div><p class="text-muted fw-bold small mb-1">DERS</p><h2 class="mb-0 fw-bold">#{dashboardBean.dersSayisi}</h2></div>
+                        <div class="stat-icon-wrapper"><i class="bi bi-book-half"></i></div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Alt Karşılama Alanı -->
-        <div class="row">
+        <!-- Yaklaşanlar (Hatırlatıcılar) -->
+        <div class="row g-4">
             <div class="col-12">
-                <div class="welcome-box">
-                    <div class="mb-4">
-                        <i class="bi bi-shield-check text-danger" style="font-size: 5rem;"></i>
-                    </div>
-                    <h1 class="fw-bold text-dark">Hoş Geldiniz, #{sessionScope.user.ad}!</h1>
-                    <p class="text-muted fs-5 mx-auto" style="max-width: 600px;">
-                        Sistemi yönetmek için sol taraftaki menüyü kullanabilirsiniz. Tüm modüllere tam erişim yetkiniz bulunmaktadır.
-                    </p>
-                    <div class="mt-4">
-                        <button class="btn btn-danger btn-lg rounded-pill px-5">Hızlı Rapor Al</button>
+                <div class="card p-4">
+                    <h5 class="fw-bold mb-4 text-dark"><i class="bi bi-bell-fill text-warning me-2"></i> Yaklaşan Hatırlatıcılar</h5>
+                    <div class="row">
+                        <!-- Sınavlar -->
+                        <div class="col-md-6 border-end">
+                            <h6 class="fw-bold text-danger mb-3">Sınav Programı</h6>
+                            <div class="list-group list-group-flush">
+                                <ui:repeat value="#{dashboardBean.yaklasanSinavlar}" var="s">
+                                    <div class="list-group-item px-0 py-3 border-0 border-bottom">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <div class="fw-bold">#{s.course.dersAdi}</div>
+                                                <span class="badge bg-light text-danger border">#{s.examType}</span>
+                                            </div>
+                                            <div class="text-end">
+                                                <div class="fw-bold small">
+                                                    <h:outputText value="#{s.examDateTime}">
+                                                        <f:convertDateTime type="localDateTime" pattern="dd MMM HH:mm" />
+                                                    </h:outputText>
+                                                </div>
+                                                <small class="text-muted">#{s.classroom}</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </ui:repeat>
+                            </div>
+                        </div>
+                        <!-- Takvim -->
+                        <div class="col-md-6 ps-md-4">
+                            <h6 class="fw-bold text-dark mb-3">Akademik Takvim</h6>
+                            <div class="list-group list-group-flush">
+                                <ui:repeat value="#{dashboardBean.yaklasanEtkinlikler}" var="etk">
+                                    <div class="list-group-item px-0 py-3 border-0 border-bottom">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <div class="fw-bold">#{etk.title}</div>
+                                                <span class="badge bg-secondary">#{etk.type}</span>
+                                            </div>
+                                            <div class="fw-bold text-muted small">
+                                                <h:outputText value="#{etk.eventDate}">
+                                                    <f:convertDateTime type="localDate" pattern="dd MMMM" />
+                                                </h:outputText>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </ui:repeat>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

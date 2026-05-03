@@ -3,69 +3,161 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="jakarta.faces.html"
       xmlns:f="jakarta.faces.core"
-      xmlns:p="jakarta.faces.passthrough"> <!-- HTML5 özellikleri (placeholder vs) için eklendi -->
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:p="jakarta.faces.passthrough">
 <h:head>
-    <title>Öğretmen Modülü</title>
-    <!-- Bootstrap 5 CSS -->
+    <title>Öğretmen Yönetimi - OBS</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
-    <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"/>
+    <style>
+        :root { --admin-red: #ff0000; --sidebar-dark: #1a1a1a; }
+        body { background-color: #f8f9fa; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; }
+        
+        .sidebar {
+            width: 260px; height: 100vh; background-color: var(--sidebar-dark);
+            position: fixed; top: 0; left: 0; color: white; padding: 20px 0;
+            box-shadow: 4px 0 10px rgba(0,0,0,0.1); z-index: 1000;
+        }
+        .sidebar-brand { padding: 0 25px 30px; border-bottom: 1px solid #333; margin-bottom: 20px; }
+        .sidebar-brand h4 { color: var(--admin-red); font-weight: bold; margin: 0; letter-spacing: 1px; }
+        
+        .nav-link {
+            color: #adb5bd; padding: 14px 25px; transition: all 0.3s;
+            display: flex; align-items: center; text-decoration: none;
+            border-left: 4px solid transparent;
+        }
+        .nav-link i { margin-right: 12px; font-size: 1.2rem; }
+        .nav-link:hover, .nav-link.active { 
+            background-color: rgba(255, 0, 0, 0.1); 
+            color: white; 
+            border-left: 4px solid var(--admin-red); 
+        }
+
+        .main-content { margin-left: 260px; padding: 30px; min-height: 100vh; }
+        
+        .header {
+            display: flex; align-items: center; gap: 20px;
+            background: white; padding: 15px 30px; border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.05); margin-bottom: 30px;
+        }
+
+        .back-btn {
+            color: var(--sidebar-dark); font-size: 1.5rem; transition: 0.3s;
+            text-decoration: none; display: flex; align-items: center;
+        }
+        .back-btn:hover { color: var(--admin-red); transform: translateX(-5px); }
+
+        .card { border-radius: 15px; border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .card-header { border-radius: 15px 15px 0 0 !important; font-weight: bold; }
+        .border-red { border-left: 5px solid var(--admin-red) !important; }
+        .text-red { color: var(--admin-red) !important; }
+        .btn-red { background-color: var(--admin-red); color: white; font-weight: bold; border-radius: 10px; }
+        .btn-red:hover { background-color: #cc0000; color: white; }
+
+        .input-group-text { background-color: white; border-left: none; cursor: pointer; color: var(--admin-red); }
+    </style>
+    <script>
+        function togglePassword() {
+            var passInput = document.getElementById('ogretmenForm:sifreInput');
+            var icon = document.getElementById('passIcon');
+            if (passInput.type === "password") {
+                passInput.type = "text";
+                icon.classList.remove('bi-eye');
+                icon.classList.add('bi-eye-slash');
+            } else {
+                passInput.type = "password";
+                icon.classList.remove('bi-eye-slash');
+                icon.classList.add('bi-eye');
+            }
+        }
+    </script>
 </h:head>
-<h:body class="bg-light">
+<h:body>
+    <f:metadata>
+        <f:event type="preRenderView" listener="#{loginBean.checkLogin}"/>
+    </f:metadata>
 
-    <!-- Üst Menü -->
-    <nav class="navbar navbar-dark bg-dark mb-4 shadow-sm">
-        <div class="container-fluid">
-            <span class="navbar-brand mb-0 h1"><i class="bi bi-person-video3 text-primary"></i> Öğretmen Yönetim Modülü</span>
-            <a href="index.xhtml" class="btn btn-outline-light btn-sm"><i class="bi bi-arrow-left"></i> Panele Dön</a>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-brand"><h4>OBS PANEL</h4></div>
+        <nav class="mt-2">
+            <a href="index.xhtml" class="nav-link"><i class="bi bi-grid-1x2-fill"></i> Ana Sayfa</a>
+            <a href="ogrenci-modul.xhtml" class="nav-link"><i class="bi bi-mortarboard-fill"></i> Öğrenci İşlemleri</a>
+            <a href="ogretmen-modul.xhtml" class="nav-link active"><i class="bi bi-person-badge-fill"></i> Öğretmen İşlemleri</a>
+            <a href="ders-modul.xhtml" class="nav-link"><i class="bi bi-journal-text"></i> Ders Yönetimi</a>
+            <a href="takvim-modul.xhtml" class="nav-link"><i class="bi bi-calendar-check-fill"></i> Akademik Takvim</a>
+            <a href="sinav-modul.xhtml" class="nav-link"><i class="bi bi-file-earmark-spreadsheet-fill"></i> Sınav Planlama</a>
+            <a href="duyuru-modul.xhtml" class="nav-link"><i class="bi bi-megaphone-fill"></i> Duyuru Yönetimi</a>
+        </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="header">
+            <a href="index.xhtml" class="back-btn" title="Geri Dön">
+                <i class="bi bi-arrow-left-circle-fill"></i>
+            </a>
+            <h4 class="mb-0 fw-bold">Öğretmen Yönetimi</h4>
         </div>
-    </nav>
 
-    <div class="container">
+        <h:messages globalOnly="true" infoClass="alert alert-success" errorClass="alert alert-danger" id="mesajlar" style="list-style:none; padding:15px; border-radius:12px;"/>
 
-        <!-- Hata ve Başarı Mesajları (Sadece uyarılar için tasarlandı) -->
-        <h:messages globalOnly="true" infoClass="alert alert-success" errorClass="alert alert-danger" style="list-style-type:none; padding: 15px; border-radius: 5px;"/>
+
 
         <div class="row">
-
-            <!-- SOL TARAF: EKLE/GÜNCELLE FORMU -->
+            <!-- Sol: Kayıt Formu -->
             <div class="col-md-4">
-                <div class="card shadow-sm mb-4 border-0">
-                    <div class="card-header bg-primary text-white">
-                        <h5 class="card-title mb-0"><i class="bi bi-person-plus-fill"></i> Öğretmen Bilgileri</h5>
+                <div class="card mb-4 border-red">
+                    <div class="card-header bg-white text-red pt-3">
+                        <h5 class="card-title fw-bold"><i class="bi bi-person-plus-fill"></i> Öğretmen Bilgileri</h5>
                     </div>
-                    <div class="card-body bg-white">
-                        <h:form id="ogretmenForm">
-                            <!-- Güncelleme işlemi için kullanıcının ID'sini gizli tutuyoruz -->
+                    <div class="card-body">
+                        <h:form id="ogretmenForm" autocomplete="off">
+                            <input type="text" style="display:none;" />
+                            <input type="password" style="display:none;" />
+                            
                             <h:inputHidden value="#{teacherBean.seciliKullanici.id}" />
-
                             <div class="mb-3">
-                                <label class="form-label fw-bold">Okul No (Kullanıcı Adı)</label>
-                                <h:inputText value="#{teacherBean.seciliKullanici.okulNo}" required="true" requiredMessage="Okul no zorunlu!" styleClass="form-control" p:placeholder="Örn: 1001" />
+                                <label class="form-label fw-bold small text-muted">Kullanıcı No</label>
+                                <h:inputText value="#{teacherBean.seciliKullanici.okulNo}" required="true" styleClass="form-control" />
                             </div>
-
                             <div class="mb-3">
-                                <label class="form-label fw-bold">Adı</label>
-                                <h:inputText value="#{teacherBean.seciliKullanici.ad}" required="true" requiredMessage="Ad zorunlu!" styleClass="form-control" p:placeholder="Öğretmen Adı" />
+                                <label class="form-label fw-bold small text-muted">Adı</label>
+                                <h:inputText value="#{teacherBean.seciliKullanici.ad}" required="true" styleClass="form-control" />
                             </div>
-
                             <div class="mb-3">
-                                <label class="form-label fw-bold">Soyadı</label>
-                                <h:inputText value="#{teacherBean.seciliKullanici.soyad}" required="true" requiredMessage="Soyad zorunlu!" styleClass="form-control" p:placeholder="Öğretmen Soyadı" />
+                                <label class="form-label fw-bold small text-muted">Soyadı</label>
+                                <h:inputText value="#{teacherBean.seciliKullanici.soyad}" required="true" styleClass="form-control" />
                             </div>
-
                             <div class="mb-3">
-                                <label class="form-label fw-bold">Şifre</label>
-                                <h:inputSecret value="#{teacherBean.seciliKullanici.sifre}" required="true" requiredMessage="Şifre zorunlu!" styleClass="form-control" p:placeholder="******" />
+                                <label class="form-label fw-bold small text-muted">Unvan</label>
+                                <h:selectOneMenu value="#{teacherBean.seciliKullanici.unvan}" styleClass="form-select">
+                                    <f:selectItem itemLabel="Prof. Dr." itemValue="Prof. Dr." />
+                                    <f:selectItem itemLabel="Doç. Dr." itemValue="Doç. Dr." />
+                                    <f:selectItem itemLabel="Dr. Öğr. Üyesi" itemValue="Dr. Öğr. Üyesi" />
+                                    <f:selectItem itemLabel="Öğr. Gör." itemValue="Öğr. Gör." />
+                                    <f:selectItem itemLabel="Arş. Gör." itemValue="Arş. Gör." />
+                                </h:selectOneMenu>
                             </div>
-
+                            <div class="mb-3">
+                                <label class="form-label fw-bold small text-muted">Bölüm</label>
+                                <h:inputText value="#{teacherBean.seciliKullanici.bolum}" styleClass="form-control" p:placeholder="Örn: Yazılım Mühendisliği" />
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold small text-muted">Şifre</label>
+                                <div class="input-group">
+                                    <h:inputSecret id="sifreInput" value="#{teacherBean.seciliKullanici.sifre}" required="true" styleClass="form-control" redisplay="true" autocomplete="new-password" />
+                                    <span class="input-group-text" onclick="togglePassword()">
+                                        <i id="passIcon" class="bi bi-eye"></i>
+                                    </span>
+                                </div>
+                            </div>
                             <div class="d-grid gap-2 mt-4">
-                                <!-- Kaydet Butonu -->
-                                <h:commandButton value="Kaydet / Güncelle" action="#{teacherBean.kaydet}" styleClass="btn btn-primary fw-bold" />
-
-                                <!-- Temizle Butonu -->
-                                <h:commandButton value="Formu Temizle" action="#{teacherBean.temizle}" styleClass="btn btn-outline-secondary" immediate="true">
-                                    <f:ajax render="@form" /> <!-- Sayfayı yenilemeden formu anında temizler -->
+                                <h:commandButton value="Kaydet / Güncelle" action="#{teacherBean.kaydet}" styleClass="btn btn-red py-2 fw-bold">
+                                    <f:ajax execute="@form" render="@form listeForm mesajlar sayac" />
+                                </h:commandButton>
+                                <h:commandButton value="Temizle" action="#{teacherBean.temizle}" styleClass="btn btn-link text-muted text-decoration-none" immediate="true">
+                                    <f:ajax render="@form" />
                                 </h:commandButton>
                             </div>
                         </h:form>
@@ -73,68 +165,72 @@
                 </div>
             </div>
 
-            <!-- SAĞ TARAF: ÖĞRETMEN LİSTESİ (TABLO) -->
+            <!-- Sağ: Liste -->
             <div class="col-md-8">
-                <div class="card shadow-sm border-0">
-                    <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
-                        <h5 class="card-title mb-0"><i class="bi bi-list-task"></i> Kayıtlı Öğretmenler Listesi</h5>
-                        <span class="badge bg-primary rounded-pill">#{teacherBean.ogretmenListesi.size()} Kişi</span>
+                <!-- Arama Çubuğu (Hizalı) -->
+                <div class="card mb-3 border-0 shadow-sm" style="border-radius: 12px;">
+                    <div class="card-body p-2">
+                        <h:form id="searchForm">
+                            <div class="input-group">
+                                <span class="input-group-text bg-transparent border-0"><i class="bi bi-search text-muted"></i></span>
+                                <h:inputText value="#{teacherBean.aramaMetni}" styleClass="form-control border-0 shadow-none" p:placeholder="Öğretmenlerde ara...">
+                                    <f:ajax event="keyup" listener="#{teacherBean.ogretmenleriGetir}" render="listeForm sayac" />
+                                </h:inputText>
+                            </div>
+                        </h:form>
                     </div>
-                    <div class="card-body bg-white p-0">
+                </div>
+
+                <div class="card border-red shadow-sm">
+                    <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center py-3">
+                        <h5 class="card-title mb-0 fw-bold"><i class="bi bi-list-stars"></i> Öğretmen Listesi</h5>
+                        <h:panelGroup id="sayac">
+                            <span class="badge bg-danger px-3 py-2" style="border-radius: 8px;">#{teacherBean.ogretmenListesi.size()} Kayıt</span>
+                        </h:panelGroup>
+                    </div>
+                    <div class="card-body p-0">
                         <h:form id="listeForm">
-                            <!-- Bootstrap Tablosu -->
-                            <h:dataTable value="#{teacherBean.ogretmenListesi}" var="ogr" styleClass="table table-striped table-hover align-middle mb-0">
-
+                            <h:dataTable value="#{teacherBean.ogretmenListesi}" var="ogr" styleClass="table table-hover align-middle mb-0">
                                 <h:column>
-                                    <f:facet name="header">Okul No</f:facet>
-                                    <span class="fw-bold text-secondary">#{ogr.okulNo}</span>
+                                    <f:facet name="header" class="ps-4">Bilgiler</f:facet>
+                                    <div class="d-flex align-items-center ps-3">
+                                        <div class="avatar-circle me-3 bg-light text-danger fw-bold d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; border-radius: 50%; border: 2px solid #eee;">
+                                            #{ogr.ad.substring(0,1)}
+                                        </div>
+                                        <div>
+                                            <div class="fw-bold text-dark">#{ogr.unvan} #{ogr.ad} #{ogr.soyad}</div>
+                                            <div class="small text-muted">ID: #{ogr.okulNo} | #{ogr.bolum}</div>
+                                        </div>
+                                    </div>
                                 </h:column>
-
                                 <h:column>
-                                    <f:facet name="header">Adı</f:facet>
-                                    #{ogr.ad}
+                                    <f:facet name="header">Durum</f:facet>
+                                    <h:commandLink action="#{teacherBean.durumDegistir(ogr)}" styleClass="text-decoration-none">
+                                        <span class="badge #{ogr.aktif ? 'bg-success' : 'bg-secondary'} px-3" style="cursor:pointer;">
+                                            #{ogr.aktif ? 'Aktif' : 'Pasif'}
+                                        </span>
+                                        <f:ajax render="listeForm" />
+                                    </h:commandLink>
                                 </h:column>
-
                                 <h:column>
-                                    <f:facet name="header">Soyadı</f:facet>
-                                    #{ogr.soyad}
-                                </h:column>
-
-                                <!-- İŞLEM BUTONLARI (GÜNCELLE & SİL) -->
-                                <h:column>
-                                    <f:facet name="header"><div class="text-center">İşlemler</div></f:facet>
-                                    <div class="text-center">
-
-                                        <!-- Seç (Forma Doldur) Butonu -->
-                                        <h:commandLink action="#{teacherBean.formaGetir(ogr)}" styleClass="btn btn-warning btn-sm me-2" title="Bilgileri Düzenle">
-                                            <i class="bi bi-pencil-square"></i> Seç
+                                    <f:facet name="header" class="text-center">İşlemler</f:facet>
+                                    <div class="text-center d-flex justify-content-center gap-2">
+                                        <h:commandLink action="#{teacherBean.formaGetir(ogr)}" styleClass="btn btn-outline-warning btn-sm" title="Düzenle">
+                                            <i class="bi bi-pencil-fill"></i>
+                                            <f:ajax render="ogretmenForm" />
                                         </h:commandLink>
-
-                                        <!-- Sil Butonu -->
-                                        <h:commandLink action="#{teacherBean.sil(ogr)}" styleClass="btn btn-danger btn-sm" onclick="return confirm('Dikkat: Bu öğretmeni silmek istediğinize emin misiniz?');" title="Sistemden Sil">
-                                            <i class="bi bi-trash-fill"></i> Sil
+                                        <h:commandLink action="#{teacherBean.sil(ogr)}" styleClass="btn btn-outline-danger btn-sm" onclick="return confirm('Silmek istediğine emin misin?');" title="Sil">
+                                            <i class="bi bi-trash3-fill"></i>
+                                            <f:ajax render="listeForm mesajlar sayac" />
                                         </h:commandLink>
-
                                     </div>
                                 </h:column>
                             </h:dataTable>
-
-                            <!-- Eğer liste boşsa ekranda bilgi mesajı ver -->
-                            <h:panelGroup rendered="#{empty teacherBean.ogretmenListesi}">
-                                <div class="text-center text-muted p-4">
-                                    <i class="bi bi-info-circle fs-4 d-block mb-2"></i>
-                                    Sistemde kayıtlı hiçbir öğretmen bulunmamaktadır.
-                                </div>
-                            </h:panelGroup>
-
                         </h:form>
                     </div>
                 </div>
             </div>
-
         </div>
     </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </h:body>
 </html>

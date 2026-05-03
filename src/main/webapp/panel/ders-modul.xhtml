@@ -3,62 +3,119 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="jakarta.faces.html"
       xmlns:f="jakarta.faces.core"
+      xmlns:ui="jakarta.faces.facelets"
       xmlns:p="jakarta.faces.passthrough">
 <h:head>
-    <title>Ders Modülü</title>
-    <!-- Bootstrap 5 CSS -->
+    <title>Ders Yönetimi - OBS</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"/>
+    <style>
+        :root { --admin-red: #ff0000; --sidebar-dark: #1a1a1a; }
+        body { background-color: #f8f9fa; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; }
+        
+        .sidebar {
+            width: 260px; height: 100vh; background-color: var(--sidebar-dark);
+            position: fixed; top: 0; left: 0; color: white; padding: 20px 0;
+            box-shadow: 4px 0 10px rgba(0,0,0,0.1); z-index: 1000;
+        }
+        .sidebar-brand { padding: 0 25px 30px; border-bottom: 1px solid #333; margin-bottom: 20px; }
+        .sidebar-brand h4 { color: var(--admin-red); font-weight: bold; margin: 0; letter-spacing: 1px; }
+        
+        .nav-link {
+            color: #adb5bd; padding: 14px 25px; transition: all 0.3s;
+            display: flex; align-items: center; text-decoration: none;
+            border-left: 4px solid transparent;
+        }
+        .nav-link i { margin-right: 12px; font-size: 1.2rem; }
+        .nav-link:hover, .nav-link.active { 
+            background-color: rgba(255, 0, 0, 0.1); 
+            color: white; 
+            border-left: 4px solid var(--admin-red); 
+        }
+
+        .main-content { margin-left: 260px; padding: 30px; min-height: 100vh; }
+        
+        .header {
+            display: flex; align-items: center; gap: 20px;
+            background: white; padding: 15px 30px; border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.05); margin-bottom: 30px;
+        }
+
+        .back-btn {
+            color: var(--sidebar-dark); font-size: 1.5rem; transition: 0.3s;
+            text-decoration: none; display: flex; align-items: center;
+        }
+        .back-btn:hover { color: var(--admin-red); transform: translateX(-5px); }
+
+        .card { border-radius: 15px; border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .card-header { border-radius: 15px 15px 0 0 !important; font-weight: bold; }
+        .border-red { border-left: 5px solid var(--admin-red) !important; }
+        .text-red { color: var(--admin-red) !important; }
+        .btn-red { background-color: var(--admin-red); color: white; font-weight: bold; border-radius: 10px; }
+        .btn-red:hover { background-color: #cc0000; color: white; }
+    </style>
 </h:head>
-<h:body class="bg-light">
+<h:body>
+    <f:metadata>
+        <f:event type="preRenderView" listener="#{loginBean.checkLogin}"/>
+    </f:metadata>
 
-    <!-- Üst Menü -->
-    <nav class="navbar navbar-dark bg-warning mb-4 shadow-sm">
-        <div class="container-fluid">
-            <span class="navbar-brand text-dark mb-0 h1"><i class="bi bi-book-half"></i> Ders Yönetim Modülü</span>
-            <a href="index.xhtml" class="btn btn-outline-dark btn-sm"><i class="bi bi-arrow-left"></i> Panele Dön</a>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-brand"><h4>OBS PANEL</h4></div>
+        <nav class="mt-2">
+            <a href="index.xhtml" class="nav-link"><i class="bi bi-grid-1x2-fill"></i> Ana Sayfa</a>
+            <a href="ogrenci-modul.xhtml" class="nav-link"><i class="bi bi-mortarboard-fill"></i> Öğrenci İşlemleri</a>
+            <a href="ogretmen-modul.xhtml" class="nav-link"><i class="bi bi-person-badge-fill"></i> Öğretmen İşlemleri</a>
+            <a href="ders-modul.xhtml" class="nav-link active"><i class="bi bi-journal-text"></i> Ders Yönetimi</a>
+            <a href="takvim-modul.xhtml" class="nav-link"><i class="bi bi-calendar-check-fill"></i> Akademik Takvim</a>
+            <a href="sinav-modul.xhtml" class="nav-link"><i class="bi bi-file-earmark-spreadsheet-fill"></i> Sınav Planlama</a>
+            <a href="duyuru-modul.xhtml" class="nav-link"><i class="bi bi-megaphone-fill"></i> Duyuru Yönetimi</a>
+        </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="header">
+            <a href="index.xhtml" class="back-btn" title="Geri Dön">
+                <i class="bi bi-arrow-left-circle-fill"></i>
+            </a>
+            <h4 class="mb-0 fw-bold">Ders Yönetimi</h4>
         </div>
-    </nav>
 
-    <div class="container">
+        <h:messages globalOnly="true" infoClass="alert alert-success" errorClass="alert alert-danger" id="mesajlar" style="list-style:none; padding:15px; border-radius:12px;"/>
 
-        <h:messages globalOnly="true" infoClass="alert alert-success" errorClass="alert alert-danger" style="list-style-type:none; padding: 15px; border-radius: 5px;"/>
+
 
         <div class="row">
-
-            <!-- SOL TARAF: EKLE FORMU -->
             <div class="col-md-4">
-                <div class="card shadow-sm mb-4 border-0">
-                    <div class="card-header bg-warning text-dark">
-                        <h5 class="card-title mb-0"><i class="bi bi-plus-square-fill"></i> Yeni Ders Ekle</h5>
+                <div class="card mb-4 border-red">
+                    <div class="card-header bg-white text-red pt-3">
+                        <h5 class="card-title fw-bold"><i class="bi bi-plus-square-fill"></i> Ders Bilgileri</h5>
                     </div>
-                    <div class="card-body bg-white">
-                        <h:form id="dersForm">
-
+                    <div class="card-body">
+                        <h:form id="dersForm" autocomplete="off">
+                            <h:inputHidden value="#{courseBean.seciliDers.id}" />
                             <div class="mb-3">
-                                <label class="form-label fw-bold text-dark">Ders Kodu</label>
-                                <h:inputText value="#{courseBean.seciliDers.dersKodu}" required="true" requiredMessage="Ders Kodu zorunlu!" styleClass="form-control border-warning" p:placeholder="Örn: MAT101" />
+                                <label class="form-label fw-bold small text-muted">Ders Kodu</label>
+                                <h:inputText value="#{courseBean.seciliDers.dersKodu}" required="true" styleClass="form-control" />
                             </div>
-
                             <div class="mb-3">
-                                <label class="form-label fw-bold text-dark">Ders Adı</label>
-                                <h:inputText value="#{courseBean.seciliDers.dersAdi}" required="true" requiredMessage="Ders Adı zorunlu!" styleClass="form-control border-warning" p:placeholder="Örn: Matematik I" />
+                                <label class="form-label fw-bold small text-muted">Ders Adı</label>
+                                <h:inputText value="#{courseBean.seciliDers.dersAdi}" required="true" styleClass="form-control" />
                             </div>
-
-                            <!-- Öğretmen Seçimi (Açılır Menü) -->
                             <div class="mb-3">
-                                <label class="form-label fw-bold text-dark">Dersi Veren Öğretmen</label>
-                                <h:selectOneMenu value="#{courseBean.seciliOgretmenId}" required="true" requiredMessage="Lütfen bir öğretmen seçin!" styleClass="form-select border-warning">
-                                    <f:selectItem itemLabel="--- Öğretmen Seçiniz ---" itemValue="#{null}" noSelectionOption="true" />
-                                    <!-- Veritabanından gelen öğretmenleri listeliyoruz -->
-                                    <f:selectItems value="#{courseBean.ogretmenListesi}" var="hoca" itemValue="#{hoca.id}" itemLabel="#{hoca.ad} #{hoca.soyad} (#{hoca.okulNo})" />
+                                <label class="form-label fw-bold small text-muted">Öğretmen</label>
+                                <h:selectOneMenu value="#{courseBean.seciliOgretmenId}" required="true" styleClass="form-select">
+                                    <f:selectItem itemLabel="Seçiniz..." itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItems value="#{courseBean.ogretmenListesi}" var="hoca" itemValue="#{hoca.id}" itemLabel="#{hoca.ad} #{hoca.soyad}" />
                                 </h:selectOneMenu>
                             </div>
-
                             <div class="d-grid gap-2 mt-4">
-                                <h:commandButton value="Dersi Sisteme Kaydet" action="#{courseBean.kaydet}" styleClass="btn btn-warning fw-bold text-dark" />
-
-                                <h:commandButton value="Formu Temizle" action="#{courseBean.temizle}" styleClass="btn btn-outline-secondary" immediate="true">
+                                <h:commandButton value="Kaydet / Güncelle" action="#{courseBean.kaydet}" styleClass="btn btn-red py-2 fw-bold">
+                                    <f:ajax execute="@form" render="@form listeForm mesajlar sayac" />
+                                </h:commandButton>
+                                <h:commandButton value="Temizle" action="#{courseBean.temizle}" styleClass="btn btn-link text-muted text-decoration-none" immediate="true">
                                     <f:ajax render="@form" />
                                 </h:commandButton>
                             </div>
@@ -67,58 +124,61 @@
                 </div>
             </div>
 
-            <!-- SAĞ TARAF: DERS LİSTESİ (TABLO) -->
             <div class="col-md-8">
-                <div class="card shadow-sm border-warning">
-                    <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
-                        <h5 class="card-title mb-0"><i class="bi bi-journals"></i> Sistemdeki Dersler</h5>
-                        <span class="badge bg-warning text-dark rounded-pill">#{courseBean.dersListesi.size()} Kayıtlı</span>
+                <!-- Arama Çubuğu (Hizalı) -->
+                <div class="card mb-3 border-0 shadow-sm" style="border-radius: 12px;">
+                    <div class="card-body p-2">
+                        <h:form id="searchForm">
+                            <div class="input-group">
+                                <span class="input-group-text bg-transparent border-0"><i class="bi bi-search text-muted"></i></span>
+                                <h:inputText value="#{courseBean.aramaMetni}" styleClass="form-control border-0 shadow-none" p:placeholder="Derslerde ara...">
+                                    <f:ajax event="keyup" listener="#{courseBean.dersleriGetir}" render="listeForm sayac" />
+                                </h:inputText>
+                            </div>
+                        </h:form>
                     </div>
-                    <div class="card-body bg-white p-0">
+                </div>
+
+                <div class="card border-red shadow-sm">
+                    <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center py-3">
+                        <h5 class="card-title mb-0 fw-bold"><i class="bi bi-journal-bookmark-fill"></i> Ders Listesi</h5>
+                        <h:panelGroup id="sayac">
+                            <span class="badge bg-danger px-3 py-2" style="border-radius: 8px;">#{courseBean.dersListesi.size()} Ders</span>
+                        </h:panelGroup>
+                    </div>
+                    <div class="card-body p-0">
                         <h:form id="listeForm">
-                            <h:dataTable value="#{courseBean.dersListesi}" var="ders" styleClass="table table-striped table-hover align-middle mb-0">
-
+                            <h:dataTable value="#{courseBean.dersListesi}" var="ders" styleClass="table table-hover align-middle mb-0">
                                 <h:column>
-                                    <f:facet name="header">Ders Kodu</f:facet>
-                                    <span class="badge bg-dark">#{ders.dersKodu}</span>
+                                    <f:facet name="header" class="ps-4">Ders Bilgisi</f:facet>
+                                    <div class="ps-3">
+                                        <div class="fw-bold text-danger">#{ders.dersKodu}</div>
+                                        <div class="text-dark">#{ders.dersAdi}</div>
+                                    </div>
                                 </h:column>
-
                                 <h:column>
-                                    <f:facet name="header">Ders Adı</f:facet>
-                                    <span class="fw-bold">#{ders.dersAdi}</span>
+                                    <f:facet name="header">Öğretmen</f:facet>
+                                    <div class="small fw-bold">#{ders.ogretmen.ad} #{ders.ogretmen.soyad}</div>
                                 </h:column>
-
                                 <h:column>
-                                    <f:facet name="header">Öğretmeni</f:facet>
-                                    <i class="bi bi-person-fill text-muted"></i> #{ders.ogretmen.ad} #{ders.ogretmen.soyad}
-                                </h:column>
-
-                                <h:column>
-                                    <f:facet name="header"><div class="text-center">İşlemler</div></f:facet>
-                                    <div class="text-center">
-                                        <!-- Ders Silme Butonu -->
-                                        <h:commandLink action="#{courseBean.sil(ders)}" styleClass="btn btn-danger btn-sm" onclick="return confirm('Bu dersi silmek istediğinize emin misiniz?');" title="Dersi Sil">
-                                            <i class="bi bi-trash-fill"></i> Sil
+                                    <f:facet name="header" class="text-center">İşlemler</f:facet>
+                                    <div class="text-center d-flex justify-content-center gap-2">
+                                        <h:commandLink action="#{courseBean.formaGetir(ders)}" styleClass="btn btn-outline-warning btn-sm" title="Düzenle">
+                                            <i class="bi bi-pencil-fill"></i>
+                                            <f:ajax render="dersForm" />
+                                        </h:commandLink>
+                                        <h:commandLink action="#{courseBean.sil(ders)}" styleClass="btn btn-outline-danger btn-sm" onclick="return confirm('Bu dersi silmek istediğine emin misin?');" title="Sil">
+                                            <i class="bi bi-trash3-fill"></i>
+                                            <f:ajax render="listeForm mesajlar sayac" />
                                         </h:commandLink>
                                     </div>
                                 </h:column>
                             </h:dataTable>
-
-                            <h:panelGroup rendered="#{empty courseBean.dersListesi}">
-                                <div class="text-center text-muted p-4">
-                                    <i class="bi bi-info-circle fs-4 d-block mb-2 text-warning"></i>
-                                    Sistemde kayıtlı hiçbir ders bulunmamaktadır.
-                                </div>
-                            </h:panelGroup>
-
                         </h:form>
                     </div>
                 </div>
             </div>
-
         </div>
     </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </h:body>
 </html>

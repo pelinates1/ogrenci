@@ -16,9 +16,14 @@ public class Users implements Serializable {
     private String ad;
     private String soyad;
     private String sifre;
+    private String bolum; // Yeni: Bölüm bilgisi
+    private String sinif; // Yeni: Öğrenci için sınıf bilgisi
+    private String unvan; // Yeni: Öğretmen için unvan (Prof, Doç vb.)
 
     @Enumerated(EnumType.STRING)
     private RoleEnum rol; // ADMIN, TEACHER veya STUDENT
+
+    private boolean aktif = true; 
 
     // Boş kurucu (JPA için zorunludur)
     public Users() {}
@@ -34,6 +39,14 @@ public class Users implements Serializable {
     public void setSoyad(String soyad) { this.soyad = soyad; }
     public String getSifre() { return sifre; }
     public void setSifre(String sifre) { this.sifre = sifre; }
+    public String getBolum() { return bolum; }
+    public void setBolum(String bolum) { this.bolum = bolum; }
+    public String getSinif() { return sinif; }
+    public void setSinif(String sinif) { this.sinif = sinif; }
+    public String getUnvan() { return unvan; }
+    public void setUnvan(String unvan) { this.unvan = unvan; }
     public RoleEnum getRol() { return rol; }
     public void setRol(RoleEnum rol) { this.rol = rol; }
+    public boolean isAktif() { return aktif; }
+    public void setAktif(boolean aktif) { this.aktif = aktif; }
 }

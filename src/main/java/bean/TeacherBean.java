@@ -18,46 +18,49 @@ import java.util.List;
 @ViewScoped
 public class TeacherBean implements Serializable {
 
-    private Users seciliKullanici; // Formda eklenecek/güncellenecek kullanıcı
-    private List<Users> ogretmenListesi; // Tablodaki liste
+    private Users seciliKullanici; 
+    private List<Users> ogretmenListesi; 
+    private String aramaMetni; // Arama özelliği için eklendi
 
     @EJB
     private UserFacadeLocal userFacade;
 
-    // Sayfa ilk açıldığında bu metot çalışır ve listeyi doldurur
     @PostConstruct
     public void init() {
         seciliKullanici = new Users();
         ogretmenleriGetir();
     }
 
-    // Sadece Öğretmenleri veritabanından çekip listeye atar
     public void ogretmenleriGetir() {
         ogretmenListesi = new ArrayList<>();
         List<Users> tumKullanicilar = userFacade.usersList();
         if (tumKullanicilar != null) {
             for (Users u : tumKullanicilar) {
+                // Sadece öğretmen rolünde olanları al
                 if (u.getRol() == RoleEnum.TEACHER) {
-                    ogretmenListesi.add(u);
+                    // Arama metni boşsa hepsini al, doluysa ad-soyad-okulNo kontrolü yap
+                    if (aramaMetni == null || aramaMetni.isEmpty() ||
+                        u.getAd().toLowerCase().contains(aramaMetni.toLowerCase()) ||
+                        u.getSoyad().toLowerCase().contains(aramaMetni.toLowerCase()) ||
+                        u.getOkulNo().contains(aramaMetni)) {
+                        ogretmenListesi.add(u);
+                    }
                 }
             }
         }
     }
 
-    // FORM: Yeni Kaydet veya Güncelle
     public void kaydet() {
         try {
             if (seciliKullanici.getId() == null) {
-                // ID boşsa yeni kayıttır (CREATE)
-                seciliKullanici.setRol(RoleEnum.TEACHER); // Otomatik öğretmen rolü ata
+                seciliKullanici.setRol(RoleEnum.TEACHER);
+                seciliKullanici.setAktif(true); // Yeni öğretmen varsayılan aktif
                 userFacade.createUser(seciliKullanici);
                 mesajGoster("Başarılı", "Öğretmen başarıyla eklendi.");
             } else {
-                // ID doluysa güncellemedir (UPDATE)
                 userFacade.editUser(seciliKullanici);
                 mesajGoster("Başarılı", "Öğretmen başarıyla güncellendi.");
             }
-            // İşlem bitince formu temizle ve listeyi yenile
             temizle();
             ogretmenleriGetir();
         } catch (Exception e) {
@@ -65,7 +68,6 @@ public class TeacherBean implements Serializable {
         }
     }
 
-    // TABLO: Seçili kişiyi sil (DELETE)
     public void sil(Users u) {
         try {
             userFacade.remove(u);
@@ -76,17 +78,29 @@ public class TeacherBean implements Serializable {
         }
     }
 
-    // TABLO: Güncelle butonuna basınca kişinin bilgilerini forma doldur
+    // YENİ: Durum Değiştir (Aktif/Pasif)
+    public void durumDegistir(Users u) {
+        u.setAktif(!u.isAktif());
+        userFacade.editUser(u);
+        ogretmenleriGetir();
+    }
+
+    // YENİ: Şifre Sıfırla (123456)
+    public void sifreSifirla(Users u) {
+        u.setSifre("123456");
+        userFacade.editUser(u);
+        mesajGoster("Bilgi", u.getAd() + " şifresi '123456' olarak sıfırlandı.");
+    }
+
     public void formaGetir(Users u) {
         this.seciliKullanici = u;
     }
 
-    // Formu sıfırla (İptal butonu için)
     public void temizle() {
         this.seciliKullanici = new Users();
+        this.aramaMetni = "";
     }
 
-    // JSF Ekrana Bilgi Mesajı (Yeşil/Kırmızı Kutu) Çıkarma
     private void mesajGoster(String baslik, String icerik) {
         FacesContext.getCurrentInstance().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO, baslik, icerik));
@@ -97,4 +111,6 @@ public class TeacherBean implements Serializable {
     public void setSeciliKullanici(Users seciliKullanici) { this.seciliKullanici = seciliKullanici; }
     public List<Users> getOgretmenListesi() { return ogretmenListesi; }
     public void setOgretmenListesi(List<Users> ogretmenListesi) { this.ogretmenListesi = ogretmenListesi; }
+    public String getAramaMetni() { return aramaMetni; }
+    public void setAramaMetni(String aramaMetni) { this.aramaMetni = aramaMetni; }
 }

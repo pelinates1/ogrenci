@@ -1,71 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:h="jakarta.faces.html"
-      xmlns:p="jakarta.faces.passthrough">
+      xmlns:h="jakarta.faces.html">
 <h:head>
     <title>Öğrenci Girişi</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
     <style>
-        body { background-color: #f4f7f6; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
-        .login-card { width: 100%; max-width: 500px; padding: 40px; border-radius: 15px; box-shadow: 0 8px 16px rgba(0,0,0,0.15); background-color: white; }
-        .back-arrow {
-            position: absolute; top: 20px; left: 20px;
-            color: #198754; text-decoration: none;
-            width: 40px; height: 40px; display: flex;
-            align-items: center; justify-content: center;
-            border-radius: 50%; border: 2px solid #198754;
-            transition: all 0.3s ease; background-color: transparent;
-        }
-        .back-arrow:hover {
-            background-color: #198754; color: white;
-            border: 2px solid white; box-shadow: 0 4px 10px rgba(25, 135, 84, 0.4);
-        }
+        body { background: #0f172a; color: white; font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .card { background: #1e293b; padding: 50px; border-radius: 20px; width: 350px; text-align: center; border: 2px solid #16a34a; }
+        h2 { margin-bottom: 30px; }
+        .lbl { text-align: left; display: block; margin-bottom: 6px; color: #94a3b8; font-size: 13px; }
+        .ibox { width: 100%; height: 45px; border-radius: 8px; border: 2px solid #475569; background: #0f172a; color: white; padding: 0 12px; font-size: 16px; box-sizing: border-box; display: block; margin-bottom: 20px; }
+        .ibox:focus { border-color: #16a34a; outline: none; }
+        .btn { width: 100%; padding: 14px; background: #16a34a; color: white; border: none; border-radius: 8px; font-size: 17px; font-weight: bold; cursor: pointer; margin-top: 5px; }
+        .btn:hover { background: #15803d; }
+        .back { position: fixed; top: 25px; left: 25px; color: #94a3b8; text-decoration: none; font-size: 26px; }
     </style>
 </h:head>
 <h:body>
-    <a href="login.xhtml" class="back-arrow" title="Geri Dön">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
-            <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"/>
-        </svg>
-    </a>
-    <div class="login-card">
-        <h2 class="text-center mb-4 text-success fw-bold">Öğrenci Girişi</h2>
-        <h:form id="studentLoginForm">
-            <h:messages globalOnly="true" styleClass="alert alert-danger fs-5" style="list-style-type: none; padding: 10px; border-radius: 5px;"/>
-            <div class="mb-4">
-                <label class="form-label fs-5 fw-semibold">Kullanıcı Adı</label>
-                <h:inputText id="username" value="#{loginBean.user.okulNo}" required="true" requiredMessage="Okul No boş bırakılamaz!" styleClass="form-control form-control-lg"/>
-            </div>
-            <div class="mb-4">
-                <label class="form-label fs-5 fw-semibold">Şifre</label>
-                <h:inputSecret id="password" value="#{loginBean.user.sifre}" required="true" requiredMessage="Şifre boş bırakılamaz!" styleClass="form-control form-control-lg"/>
-            </div>
-            <div class="d-grid gap-2 mt-2">
-                <h:commandButton id="loginBtn" value="Giriş Yap" action="#{loginBean.loginStudent}" styleClass="btn btn-success btn-lg disabled" />
-            </div>
+    <a href="login.xhtml" class="back">←</a>
+    <div class="card">
+        <h2>Öğrenci Girişi</h2>
+        <h:form id="loginForm">
+            <h:messages globalOnly="true" style="color: #ef4444; list-style-type: none; margin-bottom: 20px;"/>
+            <label class="lbl">Kullanıcı Adı</label>
+            <h:inputText id="user" value="#{loginBean.user.okulNo}" styleClass="ibox" />
+            <label class="lbl">Şifre</label>
+            <h:inputSecret id="pass" value="#{loginBean.user.sifre}" styleClass="ibox" />
+            <h:commandButton value="Giriş Yap" action="#{loginBean.loginStudent}" styleClass="btn" />
         </h:form>
     </div>
-    <script>
-        (function () {
-            function byId(id) { return document.getElementById(id); }
-            function toggle() {
-                var u = byId('studentLoginForm:username');
-                var p = byId('studentLoginForm:password');
-                var b = byId('studentLoginForm:loginBtn');
-                if (!u || !p || !b) return;
-                var ok = u.value.trim().length > 0 &amp;&amp; p.value.trim().length > 0;
-                if (ok) {
-                    b.classList.remove('disabled');
-                    b.removeAttribute('disabled');
-                } else {
-                    b.classList.add('disabled');
-                    b.setAttribute('disabled', 'disabled');
-                }
-            }
-            document.addEventListener('input', toggle, true);
-            window.addEventListener('load', toggle);
-        })();
-    </script>
 </h:body>
 </html>

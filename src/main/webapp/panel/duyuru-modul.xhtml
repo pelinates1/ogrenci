@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://xmlns.jcp.org/jsf/passthrough">
+<h:head>
+    <title>Duyuru Yönetimi - OBS</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"/>
+    <style>
+        :root { --admin-red: #ff0000; --sidebar-dark: #1a1a1a; }
+        body { background-color: #f8f9fa; font-family: 'Segoe UI', sans-serif; }
+        .sidebar { width: 260px; height: 100vh; background: var(--sidebar-dark); position: fixed; top: 0; left: 0; color: white; padding: 20px 0; z-index: 1000; }
+        .nav-link { color: #adb5bd; padding: 12px 25px; display: flex; align-items: center; text-decoration: none; transition: 0.3s; }
+        .nav-link:hover, .nav-link.active { background: rgba(255, 0, 0, 0.1); color: white; border-left: 4px solid var(--admin-red); }
+        .nav-link i { margin-right: 10px; }
+        .main-content { margin-left: 260px; padding: 30px; }
+        .card { border-radius: 15px; border: none; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        .btn-red { background: var(--admin-red); color: white; border-radius: 10px; }
+        .btn-red:hover { background: #cc0000; color: white; }
+    </style>
+</h:head>
+<h:body>
+    <f:metadata>
+        <f:event type="preRenderView" listener="#{loginBean.checkLogin}"/>
+    </f:metadata>
+
+    <div class="sidebar">
+        <div class="px-4 mb-4"><h4>OBS PANEL</h4></div>
+        <nav>
+            <a href="index.xhtml" class="nav-link"><i class="bi bi-grid-1x2-fill"></i> Ana Sayfa</a>
+            <a href="ogrenci-modul.xhtml" class="nav-link"><i class="bi bi-mortarboard-fill"></i> Öğrenci İşlemleri</a>
+            <a href="ogretmen-modul.xhtml" class="nav-link"><i class="bi bi-person-badge-fill"></i> Öğretmen İşlemleri</a>
+            <a href="ders-modul.xhtml" class="nav-link"><i class="bi bi-journal-text"></i> Ders Yönetimi</a>
+            <a href="takvim-modul.xhtml" class="nav-link"><i class="bi bi-calendar-check-fill"></i> Akademik Takvim</a>
+            <a href="sinav-modul.xhtml" class="nav-link"><i class="bi bi-file-earmark-spreadsheet-fill"></i> Sınav Planlama</a>
+            <a href="duyuru-modul.xhtml" class="nav-link active"><i class="bi bi-megaphone-fill"></i> Duyuru Yönetimi</a>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h4 class="fw-bold">Duyuru Yönetim Sistemi</h4>
+        </div>
+
+        <h:messages globalOnly="false" infoClass="alert alert-success" errorClass="alert alert-danger" styleClass="list-unstyled p-0" id="mesajlar"/>
+
+        <div class="row">
+            <!-- Duyuru Formu -->
+            <div class="col-md-5">
+                <div class="card p-4">
+                    <h5 class="fw-bold mb-4 text-danger">Yeni Duyuru Oluştur</h5>
+                    <h:form id="duyuruForm">
+                        <h:inputHidden value="#{academicBean.seciliDuyuru.id}" />
+                        <div class="mb-3">
+                            <label class="small fw-bold text-muted">Duyuru Başlığı</label>
+                            <h:inputText value="#{academicBean.seciliDuyuru.title}" required="true" styleClass="form-control" p:placeholder="Örn: Bahar Dönemi Kayıtları" />
+                        </div>
+                        <div class="mb-3">
+                            <label class="small fw-bold text-muted">Yayın Tarihi</label>
+                            <h:inputText value="#{academicBean.seciliDuyuru.publishDate}" required="true" styleClass="form-control" p:type="date">
+                                <f:convertDateTime type="localDate" pattern="yyyy-MM-dd" />
+                            </h:inputText>
+                        </div>
+                        <div class="mb-3">
+                            <label class="small fw-bold text-muted">Hedef Kitle</label>
+                            <h:selectOneMenu value="#{academicBean.seciliDuyuru.targetAudience}" styleClass="form-select">
+                                <f:selectItem itemLabel="Herkes (Öğrenci ve Öğretmen)" itemValue="BOTH" />
+                                <f:selectItem itemLabel="Sadece Öğrenciler" itemValue="STUDENT" />
+                                <f:selectItem itemLabel="Sadece Öğretmenler" itemValue="TEACHER" />
+                            </h:selectOneMenu>
+                        </div>
+                        <div class="mb-3">
+                            <label class="small fw-bold text-muted">Duyuru İçeriği</label>
+                            <h:inputTextarea value="#{academicBean.seciliDuyuru.content}" rows="5" styleClass="form-control" p:placeholder="Duyuru metnini buraya yazınız..." />
+                        </div>
+                        <div class="d-grid gap-2">
+                            <h:commandButton value="Duyuruyu Yayınla" action="#{academicBean.duyuruKaydet}" styleClass="btn btn-red py-2">
+                                <f:ajax execute="@form" render="@form listeForm mesajlar" />
+                            </h:commandButton>
+                            <h:commandButton value="Temizle" action="#{academicBean.duyuruTemizle}" styleClass="btn btn-light" immediate="true">
+                                <f:ajax render="@form" />
+                            </h:commandButton>
+                        </div>
+                    </h:form>
+                </div>
+            </div>
+
+            <!-- Duyuru Listesi -->
+            <div class="col-md-7">
+                <!-- Arama Çubuğu -->
+                <div class="card mb-3 border-0 shadow-sm" style="border-radius: 12px;">
+                    <div class="card-body p-2">
+                        <h:form id="searchForm">
+                            <div class="input-group">
+                                <span class="input-group-text bg-transparent border-0"><i class="bi bi-search text-muted"></i></span>
+                                <h:inputText value="#{academicBean.duyuruAramaMetni}" styleClass="form-control border-0 shadow-none" p:placeholder="Duyurularda ara (Başlık veya içerik)...">
+                                    <f:ajax event="keyup" listener="#{academicBean.verileriGetir}" render="listeForm" />
+                                </h:inputText>
+                            </div>
+                        </h:form>
+                    </div>
+                </div>
+
+                <div class="card p-0 overflow-hidden">
+                    <div class="card-header bg-dark text-white py-3">Yayınlanan Duyurular</div>
+                    <h:form id="listeForm">
+                        <h:dataTable value="#{academicBean.duyuruListesi}" var="d" styleClass="table table-hover align-middle mb-0">
+                            <h:column>
+                                <div class="p-3">
+                                    <div class="fw-bold">#{d.title}</div>
+                                    <small class="text-muted">#{d.publishDate}</small>
+                                    <div class="mt-1">
+                                        <h:panelGroup rendered="#{d.targetAudience eq 'BOTH'}"><span class="badge bg-primary">Herkes</span></h:panelGroup>
+                                        <h:panelGroup rendered="#{d.targetAudience eq 'STUDENT'}"><span class="badge bg-success">Öğrenciler</span></h:panelGroup>
+                                        <h:panelGroup rendered="#{d.targetAudience eq 'TEACHER'}"><span class="badge bg-warning text-dark">Öğretmenler</span></h:panelGroup>
+                                    </div>
+                                </div>
+                            </h:column>
+                            <h:column>
+                                <div class="text-end pe-3">
+                                    <h:commandLink action="#{academicBean.duyuruFormaGetir(d)}" styleClass="btn btn-outline-warning btn-sm me-1">
+                                        <i class="bi bi-pencil"></i><f:ajax render="duyuruForm" />
+                                    </h:commandLink>
+                                    <h:commandLink action="#{academicBean.duyuruSil(d)}" styleClass="btn btn-outline-danger btn-sm" onclick="return confirm('Silmek istediğine emin misin?');">
+                                        <i class="bi bi-trash"></i><f:ajax render="listeForm" />
+                                    </h:commandLink>
+                                </div>
+                            </h:column>
+                        </h:dataTable>
+                    </h:form>
+                </div>
+            </div>
+        </div>
+    </div>
+</h:body>
+</html>

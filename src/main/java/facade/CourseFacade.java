@@ -5,59 +5,55 @@ import com.example.entity.Enrollment;
 import com.example.entity.Users;
 import facadeLocal.CourseFacadeLocal;
 import jakarta.ejb.Stateless;
-import jakarta.persistence.TypedQuery;
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.CriteriaQuery;
-import jakarta.persistence.criteria.Root;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import java.util.List;
 
 @Stateless
-public class CourseFacade extends AbstractFacade implements CourseFacadeLocal {
+public class CourseFacade implements CourseFacadeLocal {
+
+    @PersistenceContext(unitName = "obsPU")
+    private EntityManager em;
 
     @Override
-    public void createCourse(Course c) {
-        this.entityManager.persist(c);
-        this.entityManager.flush();
+    public void create(Course c) {
+        em.persist(c);
     }
 
     @Override
-    public void removeCourse(Course c) {
-        Course merged = this.entityManager.merge(c);
-        this.entityManager.remove(merged);
+    public void edit(Course c) {
+        em.merge(c);
+    }
+
+    @Override
+    public void remove(Course c) {
+        em.remove(em.merge(c));
     }
 
     @Override
     public List<Course> courseList() {
-        CriteriaBuilder cb = this.entityManager.getCriteriaBuilder();
-        CriteriaQuery<Course> cq = cb.createQuery(Course.class);
-        Root<Course> root = cq.from(Course.class);
-        CriteriaQuery<Course> all = cq.select(root);
-        TypedQuery<Course> q = this.entityManager.createQuery(all);
-        return q.getResultList();
+        return em.createQuery("SELECT c FROM Course c", Course.class).getResultList();
+    }
+
+    @Override
+    public List<Users> teacherList() {
+        return em.createQuery("SELECT u FROM Users u WHERE u.rol = com.example.enums.RoleEnum.TEACHER", Users.class).getResultList();
     }
 
     @Override
     public void enrollStudent(Enrollment e) {
-        this.entityManager.persist(e);
-        this.entityManager.flush();
+        em.persist(e);
     }
 
     @Override
     public void removeEnrollment(Enrollment e) {
-        Enrollment merged = this.entityManager.merge(e);
-        this.entityManager.remove(merged);
+        em.remove(em.merge(e));
     }
 
     @Override
     public List<Course> getCoursesByTeacher(Users teacher) {
-        // Öğretmene göre dersleri listele
-        CriteriaBuilder cb = this.entityManager.getCriteriaBuilder();
-        CriteriaQuery<Course> cq = cb.createQuery(Course.class);
-        Root<Course> root = cq.from(Course.class);
-
-        cq.where(cb.equal(root.get("ogretmen"), teacher));
-
-        TypedQuery<Course> q = this.entityManager.createQuery(cq);
-        return q.getResultList();
+        return em.createQuery("SELECT c FROM Course c WHERE c.ogretmen = :teacher", Course.class)
+                 .setParameter("teacher", teacher)
+                 .getResultList();
     }
 }

@@ -5,8 +5,12 @@
              version="3.0">
 
     <persistence-unit name="obsPU" transaction-type="JTA">
-        <!-- İŞTE BU KADAR! Şifre yok, ayar yok. Sadece paneldeki ismi verdik -->
         <jta-data-source>jdbc/obs</jta-data-source>
+        <class>com.example.entity.Users</class>
+        <class>com.example.entity.Course</class>
+        <class>com.example.entity.Exam</class>
+        <class>com.example.entity.CalendarEvent</class>
+        <class>com.example.entity.Announcement</class>
         <properties>
             <property name="eclipselink.ddl-generation" value="create-or-extend-tables"/>
         </properties>

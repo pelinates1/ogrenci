@@ -8,15 +8,13 @@ import java.util.List;
 
 @Local
 public interface CourseFacadeLocal {
-    // Ders İşlemleri
-    void createCourse(Course c);
-    void removeCourse(Course c);
+    void create(Course c);
+    void edit(Course c);
+    void remove(Course c);
     List<Course> courseList();
+    List<Users> teacherList(); // Eksik olan hoca listesi metodu
 
-    // Kayıt (Enrollment) İşlemleri
     void enrollStudent(Enrollment e);
     void removeEnrollment(Enrollment e);
-
-    // Bir hocanın verdiği dersleri getiren metot
     List<Course> getCoursesByTeacher(Users teacher);
 }

@@ -20,6 +20,7 @@ public class StudentBean implements Serializable {
 
     private Users seciliOgrenci;
     private List<Users> ogrenciListesi;
+    private String aramaMetni; // Arama için yeni alan
 
     @EJB
     private UserFacadeLocal userFacade;
@@ -35,9 +36,14 @@ public class StudentBean implements Serializable {
         List<Users> tumKullanicilar = userFacade.usersList();
         if (tumKullanicilar != null) {
             for (Users u : tumKullanicilar) {
-                // Veritabanındaki rolü STUDENT olanları alıp listeye koyuyoruz
                 if (u.getRol() == RoleEnum.STUDENT) {
-                    ogrenciListesi.add(u);
+                    // Arama filtresi uygula
+                    if (aramaMetni == null || aramaMetni.isEmpty() || 
+                        u.getAd().toLowerCase().contains(aramaMetni.toLowerCase()) || 
+                        u.getSoyad().toLowerCase().contains(aramaMetni.toLowerCase()) ||
+                        u.getOkulNo().contains(aramaMetni)) {
+                        ogrenciListesi.add(u);
+                    }
                 }
             }
         }
@@ -47,6 +53,7 @@ public class StudentBean implements Serializable {
         try {
             if (seciliOgrenci.getId() == null) {
                 seciliOgrenci.setRol(RoleEnum.STUDENT);
+                seciliOgrenci.setAktif(true); // Varsayılan aktif
                 userFacade.createUser(seciliOgrenci);
                 mesajGoster("Başarılı", "Öğrenci sisteme başarıyla eklendi.");
             } else {
@@ -70,6 +77,28 @@ public class StudentBean implements Serializable {
         }
     }
 
+    public void sifreSifirla(Users u) {
+        try {
+            u.setSifre("123456");
+            userFacade.editUser(u);
+            mesajGoster("Başarılı", u.getAd() + " " + u.getSoyad() + " şifresi '123456' olarak sıfırlandı.");
+        } catch (Exception e) {
+            mesajGoster("Hata", "Şifre sıfırlama başarısız!");
+        }
+    }
+
+    public void durumDegistir(Users u) {
+        try {
+            u.setAktif(!u.isAktif());
+            userFacade.editUser(u);
+            String durum = u.isAktif() ? "Aktif" : "Pasif";
+            mesajGoster("Durum Güncellendi", "Öğrenci durumu " + durum + " yapıldı.");
+            ogrencileriGetir();
+        } catch (Exception e) {
+            mesajGoster("Hata", "Durum değiştirme başarısız!");
+        }
+    }
+
     public void formaGetir(Users u) {
         this.seciliOgrenci = u;
     }
@@ -88,4 +117,6 @@ public class StudentBean implements Serializable {
     public void setSeciliOgrenci(Users seciliOgrenci) { this.seciliOgrenci = seciliOgrenci; }
     public List<Users> getOgrenciListesi() { return ogrenciListesi; }
     public void setOgrenciListesi(List<Users> ogrenciListesi) { this.ogrenciListesi = ogrenciListesi; }
+    public String getAramaMetni() { return aramaMetni; }
+    public void setAramaMetni(String aramaMetni) { this.aramaMetni = aramaMetni; }
 }
