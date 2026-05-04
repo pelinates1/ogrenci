@@ -11,6 +11,9 @@
         <class>com.example.entity.Exam</class>
         <class>com.example.entity.CalendarEvent</class>
         <class>com.example.entity.Announcement</class>
+        <class>com.example.entity.FreezeRequest</class>
+        <class>com.example.entity.AdvisorAssignment</class>
+        <class>com.example.entity.Enrollment</class>
         <properties>
             <property name="eclipselink.ddl-generation" value="create-or-extend-tables"/>
         </properties>

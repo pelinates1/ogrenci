@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+<h:head>
+    <title>Not Girişi - Öğretmen Paneli</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"/>
+    <style>
+        :root { --teacher-blue: #0284c7; --sidebar-dark: #1e293b; }
+        body { background-color: #f1f5f9; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 0; }
+        .sidebar { width: 260px; height: 100vh; background: var(--sidebar-dark); position: fixed; top: 0; left: 0; color: white; padding: 20px 0; z-index: 1000; }
+        .nav-link { color: #94a3b8; padding: 12px 25px; display: flex; align-items: center; text-decoration: none; transition: 0.3s; }
+        .nav-link:hover, .nav-link.active { background: rgba(2, 132, 199, 0.1); color: white; border-left: 4px solid var(--teacher-blue); }
+        .nav-link i { margin-right: 10px; }
+        .main-content { margin-left: 260px; padding: 30px; }
+        .header { display: flex; justify-content: space-between; align-items: center; background: white; padding: 15px 30px; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.05); margin-bottom: 30px; }
+        .user-avatar { width: 40px; height: 40px; background: var(--teacher-blue); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; }
+        .card { border-radius: 15px; border: none; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+    </style>
+</h:head>
+<h:body>
+    <f:metadata>
+        <f:event type="preRenderView" listener="#{loginBean.checkLogin}"/>
+    </f:metadata>
+
+    <div class="sidebar">
+        <div class="px-4 mb-4"><h4>EĞİTMEN PANELİ</h4></div>
+        <nav>
+            <a href="teacher-index.xhtml" class="nav-link"><i class="bi bi-grid-1x2-fill"></i> Ana Sayfa</a>
+            <a href="teacher-lessons.xhtml" class="nav-link"><i class="bi bi-book-fill"></i> Derslerim</a>
+            <a href="teacher-schedule.xhtml" class="nav-link"><i class="bi bi-calendar-clock"></i> Ders Programı</a>
+            <a href="teacher-attendance.xhtml" class="nav-link"><i class="bi bi-person-check-fill"></i> Devamsızlık Girişi</a>
+            <a href="teacher-grades.xhtml" class="nav-link active"><i class="bi bi-pencil-square"></i> Not Girişi</a>
+            <a href="teacher-exams.xhtml" class="nav-link"><i class="bi bi-file-earmark-spreadsheet-fill"></i> Sınavlarım</a>
+            <a href="teacher-freeze.xhtml" class="nav-link"><i class="bi bi-envelope-paper-fill"></i> Danışmanlık Talepleri</a>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <!-- Header -->
+        <div class="header">
+            <div>
+                <h4 class="mb-0 fw-bold">Öğrenci Not Girişi</h4>
+                <small class="text-muted">Sınav Notlarını İşleyin ve Güncelleyin</small>
+            </div>
+            <div class="d-flex align-items-center">
+                <div class="text-end me-3 text-nowrap">
+                    <div class="fw-bold text-dark">#{sessionScope.user.ad} #{sessionScope.user.soyad}</div>
+                    <div class="d-flex flex-column">
+                        <small class="fw-bold text-primary" style="font-size: 0.85rem;">#{sessionScope.user.okulNo}</small>
+                    </div>
+                </div>
+                <div class="user-avatar me-3 flex-shrink-0">#{sessionScope.user.ad.substring(0,1)}</div>
+                <h:form>
+                    <h:commandLink action="#{loginBean.logout}" styleClass="btn btn-outline-primary btn-sm rounded-pill px-3 text-nowrap">
+                        <i class="bi bi-power me-1"></i> Çıkış Yap
+                    </h:commandLink>
+                </h:form>
+            </div>
+        </div>
+
+        <div class="card p-4">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h5 class="fw-bold mb-0">Sınav Not Girişi</h5>
+                <div class="d-flex gap-2">
+                    <select class="form-select form-select-sm" style="width: 200px;">
+                        <option>Matematik I - Vize</option>
+                        <option>Matematik I - Final</option>
+                    </select>
+                    <button id="btnSaveGrades" class="btn btn-primary btn-sm rounded-pill px-3" onclick="lockGrades()">Notları Kaydet</button>
+                    <button id="btnEditGrades" class="btn btn-outline-secondary btn-sm rounded-pill px-3 d-none" onclick="unlockGrades()">Düzenle</button>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Öğrenci No</th>
+                            <th>Ad Soyad</th>
+                            <th style="width: 150px;">Not</th>
+                            <th>Harf Notu</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="grade-row">
+                            <td>20240101</td>
+                            <td class="fw-bold">Ali Yılmaz</td>
+                            <td><input type="number" class="form-control form-control-sm grade-input" value="85" oninput="calculateLetter(this)"/></td>
+                            <td><span class="badge bg-success letter-badge">AA</span></td>
+                        </tr>
+                        <tr class="grade-row">
+                            <td>20240102</td>
+                            <td class="fw-bold">Ayşe Demir</td>
+                            <td><input type="number" class="form-control form-control-sm grade-input" value="70" oninput="calculateLetter(this)"/></td>
+                            <td><span class="badge bg-info letter-badge">BB</span></td>
+                        </tr>
+                        <tr class="grade-row">
+                            <td>20240103</td>
+                            <td class="fw-bold">Mehmet Kaya</td>
+                            <td><input type="number" class="form-control form-control-sm grade-input" value="45" oninput="calculateLetter(this)"/></td>
+                            <td><span class="badge bg-danger letter-badge">FF</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function calculateLetter(input) {
+            const score = parseInt(input.value);
+            const row = input.closest('tr');
+            const badge = row.querySelector('.letter-badge');
+            
+            let letter = "FF";
+            let color = "bg-danger";
+            
+            if (score >= 90) { letter = "AA"; color = "bg-success"; }
+            else if (score >= 80) { letter = "BA"; color = "bg-success"; }
+            else if (score >= 70) { letter = "BB"; color = "bg-info"; }
+            else if (score >= 60) { letter = "CB"; color = "bg-info"; }
+            else if (score >= 50) { letter = "CC"; color = "bg-warning"; }
+            else if (score >= 40) { letter = "DC"; color = "bg-warning"; }
+            else if (score >= 30) { letter = "DD"; color = "bg-secondary"; }
+            
+            badge.innerText = letter;
+            badge.className = "badge letter-badge " + color;
+        }
+
+        function lockGrades() {
+            document.querySelectorAll('.grade-input').forEach(el => el.disabled = true);
+            document.getElementById('btnSaveGrades').classList.add('d-none');
+            document.getElementById('btnEditGrades').classList.remove('d-none');
+            alert("Tüm notlar başarıyla sisteme işlendi.");
+        }
+
+        function unlockGrades() {
+            document.querySelectorAll('.grade-input').forEach(el => el.disabled = false);
+            document.getElementById('btnSaveGrades').classList.remove('d-none');
+            document.getElementById('btnEditGrades').classList.add('d-none');
+        }
+    </script>
+</h:body>
+</html>

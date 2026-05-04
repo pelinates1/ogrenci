@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://xmlns.jcp.org/jsf/passthrough">
+<h:head>
+    <title>Dondurma Talepleri - OBS Yönetim</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"/>
+    <style>
+        :root { --admin-red: #ff0000; --sidebar-dark: #1a1a1a; }
+        body { background-color: #f8f9fa; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 0; }
+        .sidebar { width: 260px; height: 100vh; background: var(--sidebar-dark); position: fixed; top: 0; left: 0; color: white; padding: 20px 0; z-index: 1000; }
+        .nav-link { color: #adb5bd; padding: 12px 25px; display: flex; align-items: center; text-decoration: none; transition: 0.3s; }
+        .nav-link:hover, .nav-link.active { background: rgba(255, 0, 0, 0.1); color: white; border-left: 4px solid var(--admin-red); }
+        .nav-link i { margin-right: 10px; }
+        .main-content { margin-left: 260px; padding: 30px; }
+        .header {
+            display: flex; align-items: center; gap: 20px;
+            background: white; padding: 15px 30px; border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.05); margin-bottom: 30px;
+        }
+
+        .back-btn {
+            color: var(--sidebar-dark); font-size: 1.5rem; transition: 0.3s;
+            text-decoration: none; display: flex; align-items: center;
+        }
+        .back-btn:hover { color: var(--admin-red); transform: translateX(-5px); }
+        .card { border-radius: 15px; border: none; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+    </style>
+</h:head>
+<h:body>
+    <f:metadata>
+        <f:event type="preRenderView" listener="#{loginBean.checkLogin}"/>
+    </f:metadata>
+
+    <div class="sidebar">
+        <div class="px-4 mb-4"><h4>OBS PANEL</h4></div>
+        <nav>
+            <a href="index.xhtml" class="nav-link"><i class="bi bi-grid-1x2-fill"></i> Ana Sayfa</a>
+            <a href="ogrenci-modul.xhtml" class="nav-link"><i class="bi bi-mortarboard-fill"></i> Öğrenci İşlemleri</a>
+            <a href="ogretmen-modul.xhtml" class="nav-link"><i class="bi bi-person-badge-fill"></i> Öğretmen İşlemleri</a>
+            <a href="ders-modul.xhtml" class="nav-link"><i class="bi bi-journal-text"></i> Ders Yönetimi</a>
+            <a href="takvim-modul.xhtml" class="nav-link"><i class="bi bi-calendar-check-fill"></i> Akademik Takvim</a>
+            <a href="sinav-modul.xhtml" class="nav-link"><i class="bi bi-file-earmark-spreadsheet-fill"></i> Sınav Planlama</a>
+            <a href="duyuru-modul.xhtml" class="nav-link"><i class="bi bi-megaphone-fill"></i> Duyuru Yönetimi</a>
+            <a href="admin-advisor.xhtml" class="nav-link"><i class="bi bi-person-lines-fill"></i> Danışman Atama</a>
+            <a href="admin-freeze.xhtml" class="nav-link active"><i class="bi bi-pause-circle-fill"></i> Dondurma Talepleri</a>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <div class="header">
+            <a href="index.xhtml" class="back-btn" title="Geri Dön">
+                <i class="bi bi-arrow-left-circle-fill"></i>
+            </a>
+            <h4 class="mb-0 fw-bold">Öğrenci Dondurma Talepleri</h4>
+        </div>
+
+        <div class="card p-4 h-100">
+            <h5 class="fw-bold mb-4 text-dark"><i class="bi bi-shield-check text-danger me-2"></i> Yönetici Onayı Bekleyen Talepler</h5>
+            <div class="alert alert-danger border-0 rounded-4 mb-4">
+                <small><i class="bi bi-exclamation-octagon-fill me-2"></i> Talebi onayladığınızda, ilgili öğrencinin sistem durumu <strong>"Pasif"</strong> olarak güncellenecektir.</small>
+            </div>
+
+            <div class="table-responsive">
+                <h:form id="adminFreezeForm">
+                    <h:messages globalOnly="true" styleClass="alert alert-info rounded-3 shadow-sm border-0" />
+                    
+                    <h:dataTable value="#{freezeBean.yoneticiTalepleri}" var="t" styleClass="table table-hover align-middle">
+                        <h:column>
+                            <f:facet name="header">Tarih</f:facet>
+                            <h:outputText value="#{t.requestDate}">
+                                <f:convertDateTime type="localDate" pattern="dd.MM.yyyy" />
+                            </h:outputText>
+                        </h:column>
+                        <h:column>
+                            <f:facet name="header">Öğrenci</f:facet>
+                            <span class="fw-bold">#{t.student.ad} #{t.student.soyad}</span> <br/>
+                            <small class="text-muted">#{t.student.okulNo} - #{t.student.bolum} (#{t.student.sinif})</small>
+                        </h:column>
+                        <h:column>
+                            <f:facet name="header">Dondurma Nedeni</f:facet>
+                            #{t.reason}
+                        </h:column>
+                        <h:column>
+                            <f:facet name="header">İşlemler</f:facet>
+                            <div class="d-flex gap-2">
+                                <h:commandButton value="Onayla ve Pasife Al" action="#{freezeBean.yoneticiOnayla(t)}" styleClass="btn btn-sm btn-success rounded-pill px-3" onclick="return confirm('Talebi onaylamak ve öğrenciyi pasif duruma almak istediğinize emin misiniz?');"/>
+                                <h:commandButton value="Reddet" action="#{freezeBean.yoneticiReddet(t)}" styleClass="btn btn-sm btn-outline-danger rounded-pill px-3" onclick="return confirm('Talebi reddetmek istediğinize emin misiniz?');"/>
+                            </div>
+                        </h:column>
+                    </h:dataTable>
+                    
+                    <h:panelGroup rendered="#{empty freezeBean.yoneticiTalepleri}">
+                        <div class="text-center py-5">
+                            <i class="bi bi-check-circle text-muted" style="font-size: 3rem;"></i>
+                            <p class="text-muted mt-2">Yönetici onayı bekleyen kayıt dondurma talebi bulunmamaktadır.</p>
+                        </div>
+                    </h:panelGroup>
+                </h:form>
+            </div>
+        </div>
+    </div>
+</h:body>
+</html>
