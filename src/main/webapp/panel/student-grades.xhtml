@@ -39,27 +39,33 @@
             <a href="student-grades.xhtml" class="nav-link active"><i class="bi bi-award-fill"></i> Notlarım</a>
             <a href="student-attendance.xhtml" class="nav-link"><i class="bi bi-person-check-fill"></i> Devamsızlık</a>
             <a href="student-schedule.xhtml" class="nav-link"><i class="bi bi-calendar-week-fill"></i> Ders Programı</a>
+            <a href="student-freeze.xhtml" class="nav-link"><i class="bi bi-pause-circle-fill"></i> Kayıt Dondurma</a>
+            <a href="student-settings.xhtml" class="nav-link"><i class="bi bi-gear-fill"></i> Ayarlar</a>
         </nav>
     </div>
 
     <div class="main-content">
         <!-- Header -->
-        <div class="header">
-            <div>
-                <h4 class="mb-0 fw-bold">Hoş Geldin, #{sessionScope.user.ad}</h4>
-                <small class="text-muted">Eğitim Hayatında Başarılar Dileriz.</small>
-            </div>
+        <div class="header py-3 px-4 shadow-sm border-0" style="border-radius: 15px;">
             <div class="d-flex align-items-center">
-                <div class="text-end me-3">
-                    <div class="fw-bold text-dark">#{sessionScope.user.ad} #{sessionScope.user.soyad}</div>
-                    <div class="d-flex flex-column">
-                        <small class="fw-bold text-success" style="font-size: 0.85rem;">#{sessionScope.user.okulNo}</small>
-                    </div>
+                <div class="bg-success-subtle p-3 rounded-4 me-3 d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                    <i class="bi bi-mortarboard-fill text-success fs-2"></i>
                 </div>
-                <div class="user-avatar me-3">#{sessionScope.user.ad.substring(0,1)}</div>
-                <h:form>
-                    <h:commandLink action="#{loginBean.logout}" styleClass="btn btn-outline-success btn-sm rounded-pill px-3">
-                        <i class="bi bi-power me-1"></i> Çıkış Yap
+                <div>
+                    <h6 class="mb-0 text-muted small">Öğrenci Paneli,</h6>
+                    <h3 class="mb-1 fw-bold text-dark">#{sessionScope.user.ad} #{sessionScope.user.soyad}</h3>
+                    <small class="text-muted d-block">Eğitim Hayatında Başarılar Dileriz.</small>
+                </div>
+            </div>
+            <div class="d-flex align-items-center ms-auto">
+                <div class="text-end me-3">
+                    <div class="fw-bold text-dark mb-0">Öğrenci Kullanıcısı</div>
+                    <small class="text-success fw-bold">#{sessionScope.user.okulNo}</small>
+                </div>
+                <div class="avatar-circle bg-success text-white fw-bold me-3 shadow-sm" style="width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">#{sessionScope.user.ad.substring(0,1)}</div>
+                <h:form styleClass="m-0">
+                    <h:commandLink action="#{loginBean.logout}" styleClass="btn btn-outline-success rounded-pill px-4 py-2 d-flex align-items-center gap-2 fw-bold" style="white-space: nowrap; transition: 0.3s;">
+                        <i class="bi bi-power fs-5"></i> Çıkış
                     </h:commandLink>
                 </h:form>
             </div>
@@ -104,7 +110,7 @@
 
         <div class="card p-4">
             <div class="d-flex justify-content-between align-items-center mb-4">
-                <h5 class="fw-bold mb-0">Sınav Sonuç Listesi</h5>
+                <h5 class="fw-bold mb-0"><i class="bi bi-award-fill me-2 text-success"></i> Sınav Sonuç Listesi</h5>
                 <div class="d-flex gap-2">
                     <select class="form-select form-select-sm" style="width: 200px;">
                         <option>2023-2024 Güz Dönemi</option>

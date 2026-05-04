@@ -28,6 +28,8 @@ public class FreezeBean implements Serializable {
     private List<FreezeRequest> ogrenciTalepleri;
     private List<FreezeRequest> danismanTalepleri;
     private List<FreezeRequest> yoneticiTalepleri;
+    private String secilenNeden;
+    private String detayAciklama;
 
     @EJB
     private FreezeRequestFacadeLocal freezeRequestFacade;
@@ -70,10 +72,16 @@ public class FreezeBean implements Serializable {
         Users student = getCurrentUser();
         if (student == null) return;
 
+        // Öğrenci verilerini kontrol et
+        if (student.getBolum() == null || student.getBolum().isEmpty() || student.getSinif() == null || student.getSinif().isEmpty()) {
+            mesajGoster("Eksik Bilgi", "Akademik bilgileriniz (Bölüm/Sınıf) eksik olduğu için başvuru yapılamıyor. Lütfen yönetici ile iletişime geçin.");
+            return;
+        }
+
         // Öğrencinin danışmanı var mı kontrol et
         AdvisorAssignment advisor = advisorAssignmentFacade.findByDepartmentAndClass(student.getBolum(), student.getSinif());
         if (advisor == null) {
-            mesajGoster("Hata", "Sistemde bölümünüz ve sınıfınız için atanmış bir danışman bulunmamaktadır. Lütfen yönetici ile iletişime geçin.");
+            mesajGoster("Danışman Ataması Yok", student.getBolum() + " " + student.getSinif() + ". Sınıf için atanmış bir danışman bulunamadı. Lütfen önce danışman atanmasını bekleyin.");
             return;
         }
 
@@ -90,6 +98,9 @@ public class FreezeBean implements Serializable {
         yeniTalep.setStudent(student);
         yeniTalep.setRequestDate(new Date());
         yeniTalep.setStatus(FreezeStatusEnum.PENDING_ADVISOR);
+        
+        // Neden ve detayı birleştir
+        yeniTalep.setReason(secilenNeden + " - " + detayAciklama);
 
         try {
             freezeRequestFacade.create(yeniTalep);
@@ -184,4 +195,10 @@ public class FreezeBean implements Serializable {
     public void setDanismanTalepleri(List<FreezeRequest> danismanTalepleri) { this.danismanTalepleri = danismanTalepleri; }
     public List<FreezeRequest> getYoneticiTalepleri() { return yoneticiTalepleri; }
     public void setYoneticiTalepleri(List<FreezeRequest> yoneticiTalepleri) { this.yoneticiTalepleri = yoneticiTalepleri; }
+
+    public String getSecilenNeden() { return secilenNeden; }
+    public void setSecilenNeden(String secilenNeden) { this.secilenNeden = secilenNeden; }
+
+    public String getDetayAciklama() { return detayAciklama; }
+    public void setDetayAciklama(String detayAciklama) { this.detayAciklama = detayAciklama; }
 }
